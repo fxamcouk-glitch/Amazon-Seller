@@ -66,12 +66,23 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - Dependencies are on **Next.js 16.4.3**, because 16.3.0 has critical security advisories. `npm audit` reports 0 vulnerabilities.
 - Note: `next@16` has breaking changes from older versions. Read `node_modules/next/dist/docs/` before writing code.
 
+## Answers so far (2026-10-24)
+
+1. **Seller Central:** the owner can still log in. It should reactivate once the bank details are updated (owner to do this).
+2. **Old order link:** probably a paid third-party plugin service; not remembered. The owner would rather **build our own**.
+
+## Own order bridge (store order -> Amazon MCF)
+
+- Amazon's SP-API **Fulfillment Outbound API** (`createFulfillmentOrder`) is the MCF endpoint. It needs the "Amazon Fulfillment" role and is rate limited (about 2 requests a second, burst 30). A newer 2026-07-04 version with an order-preview call exists; check which version to target. Docs: [Fulfillment Outbound API](https://developer-docs.amazon.com/sp-api/docs/fulfillment-outbound-api), [migration guide](https://developer-docs.amazon/sp-api/lang-US/docs/fulfillment-outbound-migration-guide).
+- A **private seller app** is self-authorised and only usable on our own account. It needs a Professional selling account, and the **primary account user** must register as an SP-API developer first. Docs: [SP-API registration overview](https://developer-docs.amazon.com/sp-api/lang-US/docs/sp-api-registration-overview). Not confirmed: UK-specific steps and which roles need extra approval. Check the live authorization limits page.
+- Planned flow: store order webhook -> map store SKU to Amazon seller SKU -> preview fulfillability -> create fulfilment order -> poll or listen for tracking -> write the tracking number back to the store and the dashboard.
+- Build it behind the store-connector interface so it works for Shopify now and our own site later.
+
 ## Open questions (unanswered)
 
-1. Is the Seller Central account active, suspended or closed?
-2. How did Shopify hand orders to Amazon: the MCF app, a manual link or a third-party connector?
-3. Where should it run: free tiers, an existing paid host or locally only?
-4. Does the account have Brand Registry, which Amazon Attribution needs?
+1. Where should it run: free tiers, an existing paid host or locally only?
+2. Does the account have Brand Registry, which Amazon Attribution needs?
+3. Is the account a Professional selling plan (needed for the private SP-API app)?
 
 ## Next steps
 
