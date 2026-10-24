@@ -120,6 +120,10 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 
 (Shipping is settled: see below.)
 
+## Parked: website build kickoff
+
+`docs/website-build-prompt.md` is a self-contained prompt for a new session to continue the website build (audit fixes, database, Stripe orders, compliance pages, content, Amazon bridge, deployment). Open it when ready.
+
 ## Next steps
 
 1. Answer the open questions.
