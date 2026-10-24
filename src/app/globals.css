@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+/* The single place for shared values. Pages use these tokens, never raw colours. */
+@theme static {
+  --color-surface: #ffffff;
+  --color-page: #f5f6f8;
+  --color-line: #dfe2e8;
+  --color-ink: #16181d;
+  --color-muted: #5a6170;
+  --color-accent: #1d4ed8;
+  --color-accent-ink: #ffffff;
+  --color-good: #166534;
+  --color-good-bg: #dcfce7;
+  --color-warn: #854d0e;
+  --color-warn-bg: #fef3c7;
+  --color-bad: #991b1b;
+  --color-bad-bg: #fee2e2;
+  /* Channel colours (chart marks); always paired with a text label. */
+  --color-amazon: #d97706;
+  --color-shopify: #15803d;
+  --color-website: #1d4ed8;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-surface: #1a1d24;
+    --color-page: #0f1115;
+    --color-line: #2c313b;
+    --color-ink: #eef0f4;
+    --color-muted: #a3aab8;
+    --color-accent: #7aa2ff;
+    --color-accent-ink: #0f1115;
+    --color-good: #86efac;
+    --color-good-bg: #14301f;
+    --color-warn: #fcd34d;
+    --color-warn-bg: #3a2c0a;
+    --color-bad: #fca5a5;
+    --color-bad-bg: #3d1717;
+    --color-amazon: #f59e0b;
+    --color-shopify: #4ade80;
+    --color-website: #7aa2ff;
+  }
+}
+
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}

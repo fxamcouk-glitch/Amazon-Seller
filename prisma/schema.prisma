@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Channel {
+  AMAZON
+  SHOPIFY
+  WEBSITE
+}
+
+model Product {
+  id        String    @id @default(cuid())
+  sku       String    @unique
+  name      String
+  costPence Int       @default(0)
+  listings  Listing[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// One product can have a listing per channel (Amazon ASIN, Shopify product, website page).
+model Listing {
+  id              String   @id @default(cuid())
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  channel         Channel
+  externalId      String? // ASIN or Shopify product id
+  title           String
+  bullets         String[]
+  description     String   @default("")
+  backendKeywords String   @default("") // Amazon search terms; unused on other channels
+  seoTitle        String? // Shopify/website SEO title
+  metaDescription String?
+  updatedAt       DateTime @updatedAt
+
+  @@unique([productId, channel])
+}
+
+model TrackedLink {
+  id          String   @id @default(cuid())
+  label       String
+  destination String
+  source      String
+  medium      String
+  campaign    String
+  content     String?
+  url         String // final URL with UTM / Attribution tags
+  createdAt   DateTime @default(now())
+}
+
+model ChannelDailyStat {
+  id       String   @id @default(cuid())
+  date     DateTime @db.Date
+  channel  Channel
+  revenuePence Int
+  orders   Int
+  units    Int
+  sessions Int
+
+  @@unique([date, channel])
+}

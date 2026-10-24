@@ -16,6 +16,15 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 4. **Instagram/Meta ads:** link them into the same dashboard.
 5. Any other useful features (suggestions below).
 
+## Direction on the website (added 2026-10-24)
+
+- The owner is **not tied to Shopify**. When we set up our own website, the platform is open.
+- What matters most for that site: **very good SEO**, and **orders dispatched by Amazon** (MCF).
+- Design consequences:
+  - The dashboard treats each sales source as a *channel* (`Channel` in `prisma/schema.prisma` and `src/lib/types.ts`). Shopify is just the first store connector; a custom or other-platform store plugs in the same way.
+  - Pick the website platform on two tests: technical SEO control (server-rendered pages, structured data, sitemap, speed) and how easily orders can be pushed to Amazon MCF through the SP-API.
+  - A custom Next.js storefront in this repo would give full SEO control and a direct MCF order hook, but means building cart and payments. Decide this before building the store connector.
+
 ## Research findings
 
 - Amazon has an [MCF app for Shopify](https://apps.shopify.com/buy-with-prime). It is free to install, with fulfilment fees per order.
@@ -49,6 +58,9 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - **Estimated running cost:** about £0–7 a month on free tiers, plus Claude API usage.
 
 ## Done so far
+
+- **Dashboard shell** (branch `claude/charming-bohr-8s2vp7`): Overview (revenue by channel, daily chart, conversion), Listings & SEO (Amazon length and keyword checks with a score), Tracked links (UTM builder with an Amazon Attribution warning). All pages read **sample data** through `src/lib/data.ts`; replace its bodies with Prisma queries and live connectors. Pure logic is covered by `npm test`.
+- Prisma schema for products, listings, tracked links and daily channel stats (not yet migrated; needs `DATABASE_URL`).
 
 - Created the `Amazon-Seller` repo scaffold on branch `claude/zen-archimedes-2bo6xh`: `package.json`, `package-lock.json` and `.gitignore`. There is no application code yet.
 - Dependencies are on **Next.js 16.4.3**, because 16.3.0 has critical security advisories. `npm audit` reports 0 vulnerabilities.
