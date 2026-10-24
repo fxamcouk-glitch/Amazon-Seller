@@ -5,7 +5,7 @@ import { formatPounds } from "@/lib/stats";
 import { productPath } from "@/lib/seo-meta";
 
 export const metadata: Metadata = {
-  title: { absolute: "Braided Fabric Cable for Lamps and Lighting | The Cable Store" },
+  title: { absolute: "Braided Fabric Cable for Lamps and Lights | The Cable Store" },
   description: "Three core fabric braided cable for lamp rewires and pendant lights, cut to length and dispatched from the UK.",
   alternates: { canonical: "/" },
 };

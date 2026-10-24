@@ -43,23 +43,22 @@ hands orders to Amazon for dispatch (Amazon Multi-Channel Fulfilment, "MCF").
 - Prisma schema exists (`prisma/schema.prisma`) but nothing is migrated yet.
 - `npm test`, `npm run lint` and `npx tsc --noEmit` all pass. Keep them passing.
 
-## Open SEO audit findings to fix first
-From a read-only code audit of the storefront:
-1. `src/lib/site.ts:4` falls back to `http://localhost:3000` if `SITE_URL` is unset at build time,
-   which would put localhost in every canonical, the sitemap, robots and structured data.
-   Make production builds fail loudly when `SITE_URL` is missing.
-2. Product titles can reach about 63 characters because the name is shortened before the
-   ` | The Cable Store` template is added (`src/app/(store)/products/[slug]/page.tsx`, `src/app/layout.tsx`).
-   Shorten the name to leave room for the suffix.
-3. Breadcrumb JSON-LD has no visible breadcrumb on the page. Add a visible trail or drop the markup.
-4. Small: `lang="en-GB"` in `src/app/layout.tsx`; add a favicon (`src/app/icon.*`); sitemap sets
-   `changeFrequency` and `priority` (ignored by Google) and no real `lastModified`.
-5. Waiting on owner inputs: product images (JSON-LD `image`, `openGraph.images`), and delivery
-   time plus return policy markup for `shippingDetails` and merchant listing data. Verify these
-   in Google's Rich Results Test after deploying; do not assume.
+## SEO audit findings
+Fixed (verified in a production build): `SITE_URL` is now required for production builds and runs
+(`src/lib/site.ts`); product titles keep distinct names and drop the brand suffix when it would push
+them past 60 characters (`fullTitle` in `src/lib/seo-meta.ts`); the breadcrumb is visible and shares
+one trail with its structured data; `lang="en-GB"`; placeholder favicon at `src/app/icon.svg`
+(replace with the real logo); sitemap no longer sets `changeFrequency` or `priority`.
+
+Still open, waiting on owner inputs:
+1. Product images (JSON-LD `image`, `openGraph.images`); product pages are probably ineligible for
+   product rich results without one.
+2. Delivery time and return policy markup for `shippingDetails` and merchant listing data.
+   Verify in Google's Rich Results Test after deploying; do not assume.
+3. Sitemap `lastModified` once products have a real modified date (database).
 
 ## Build order
-1. Fix the audit findings above.
+1. Close the open audit findings above once the owner supplies the inputs.
 2. Database: replace the file store and the in-code catalogue with Prisma and Postgres
    (products, listings, orders). Migrations need a real `DATABASE_URL`; ask the owner to create a
    free Postgres (for example Neon) rather than creating one yourself.

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PRODUCTS, getProduct } from "@/lib/catalogue";
 import { formatPounds } from "@/lib/stats";
-import { DESCRIPTION_MAX, TITLE_MAX, breadcrumbJsonLd, jsonLdString, productJsonLd, productPath, truncate } from "@/lib/seo-meta";
+import { DESCRIPTION_MAX, breadcrumbJsonLd, breadcrumbTrail, fullTitle, jsonLdString, productJsonLd, productPath, truncate } from "@/lib/seo-meta";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -13,10 +14,10 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = getProduct((await params).slug);
   if (!product) return {};
-  const title = truncate(product.name, TITLE_MAX);
+  const title = fullTitle(product.name);
   const description = truncate(product.summary, DESCRIPTION_MAX);
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: { canonical: productPath(product) },
     openGraph: { type: "website", title, description, url: productPath(product) },
@@ -27,8 +28,31 @@ export default async function ProductPage({ params }: Props) {
   const product = getProduct((await params).slug);
   if (!product) notFound();
 
+  const trail = breadcrumbTrail(product);
+
   return (
     <article>
+      <nav aria-label="Breadcrumb" className="mb-4 text-sm">
+        <ol className="flex flex-wrap gap-x-2">
+          {trail.map((crumb, i) => {
+            const last = i === trail.length - 1;
+            return (
+              <li key={crumb.path} className="flex gap-2">
+                {last ? (
+                  <span aria-current="page" className="text-muted">{crumb.name}</span>
+                ) : (
+                  <>
+                    <Link href={crumb.path} className="text-accent underline focus-visible:outline-2 focus-visible:outline-accent">
+                      {crumb.name}
+                    </Link>
+                    <span aria-hidden className="text-muted">/</span>
+                  </>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdString([productJsonLd(product), breadcrumbJsonLd(product)]) }}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { PRODUCTS } from "./catalogue";
-import { DESCRIPTION_MAX, TITLE_MAX, jsonLdString, productJsonLd, truncate } from "./seo-meta";
+import { DESCRIPTION_MAX, TITLE_MAX, breadcrumbJsonLd, breadcrumbTrail, fullTitle, jsonLdString, productJsonLd, truncate } from "./seo-meta";
 
 describe("truncate", () => {
   it("leaves short text alone", () => {
@@ -50,7 +50,34 @@ describe("catalogue", () => {
     for (const p of PRODUCTS) expect(p.summary.length).toBeLessThanOrEqual(DESCRIPTION_MAX);
   });
 
-  it("keeps names within a sensible title length", () => {
-    for (const p of PRODUCTS) expect(p.name.length).toBeLessThanOrEqual(TITLE_MAX + 10);
+  it("gives every product a distinct title within the length limit", () => {
+    const titles = PRODUCTS.map((p) => fullTitle(p.name));
+    expect(new Set(titles).size).toBe(PRODUCTS.length);
+    for (const t of titles) expect(t.length).toBeLessThanOrEqual(TITLE_MAX);
+  });
+});
+
+describe("fullTitle", () => {
+  it("adds the brand suffix when the title still fits", () => {
+    expect(fullTitle("Short name")).toBe("Short name | The Cable Store");
+  });
+
+  it("drops the suffix, not the product name, when it would not fit", () => {
+    const name = "x".repeat(45);
+    expect(fullTitle(name)).toBe(name);
+  });
+
+  it("truncates only when the name alone is too long", () => {
+    expect(fullTitle("word ".repeat(20)).length).toBeLessThanOrEqual(TITLE_MAX);
+  });
+});
+
+describe("breadcrumbs", () => {
+  it("builds the structured data from the same trail the page shows", () => {
+    const trail = breadcrumbTrail(PRODUCTS[0]);
+    const items = breadcrumbJsonLd(PRODUCTS[0]).itemListElement;
+    expect(items.map((i) => i.name)).toEqual(trail.map((c) => c.name));
+    expect(items.map((i) => i.position)).toEqual([1, 2]);
+    expect(items[1].item.endsWith(trail[1].path)).toBe(true);
   });
 });
