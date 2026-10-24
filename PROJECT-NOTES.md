@@ -105,9 +105,15 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - Because delivery is free, the **MCF fee per order comes out of margin**. The dashboard's margin view must subtract the per-order MCF fee (and the 1.5% UK fuel and logistics surcharge noted above) so prices can be set to cover it. Current UK MCF rates were not confirmed; take them from Seller Central.
 - Delivery time (dispatch plus transit) is not yet known; add it to the structured data once confirmed.
 
+## Selling plan (answered 2026-10-24)
+
+- The account is **not on the Professional plan** (so Individual). Per secondary sources ([WorldFirst](https://www.worldfirst.com/uk/blog/global-business-tips/how-much-does-it-cost-to-sell-on-amazon/), [Osome](https://osome.com/uk/blog/amazon-seller-fees/)), Individual has no access to advertising tools, bulk listing or the API; Professional is about £25 a month ex VAT (about £30 if VAT can't be reclaimed, as when not VAT registered) against £0.75 per item sold on Individual, breaking even near 35 units a month. Confirm current prices and what Individual can do on Amazon's UK pricing page.
+- Consequence: **upgrading to Professional is required** before the SP-API private app (order bridge, listings sync, reports), Amazon Ads (PPC) and, probably, any Brand Registry-linked tools can be used. Do it when reactivating the account.
+- Not verified: whether Brand Registry or MCF itself is available on Individual.
+- Until upgrade, build everything that does not need Amazon access: storefront, dashboard, listings/SEO checks, tracked links, data model.
+
 ## Open questions (unanswered)
 
-1. Is the account a Professional selling plan (needed for the private SP-API app)?
 (Shipping is settled: see below.)
 
 ## Next steps
