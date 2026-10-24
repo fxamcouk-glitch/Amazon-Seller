@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Card } from "@/components/card";
 import { PageHeader } from "@/components/page-header";
 import { getListings } from "@/lib/data";
@@ -9,6 +10,8 @@ function scoreClasses(score: number): string {
   return "bg-bad-bg text-bad";
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function ListingsPage() {
   const listings = (await getListings()).filter((l) => l.channel === "amazon");
 
@@ -18,9 +21,15 @@ export default async function ListingsPage() {
         title="Listings & SEO"
         description="Amazon listings checked against length and keyword rules. Limits are common defaults; confirm them against your category's style guide."
       />
+      <p className="mb-4 text-sm">
+        <Link href="/admin/listings/new" className="text-accent underline focus-visible:outline-2 focus-visible:outline-accent">
+          Add listing
+        </Link>
+      </p>
       <div className="grid gap-4">
         {listings.map((listing) => {
-          const { score, issues } = checkAmazonListing(listing);
+          const { score, issues, keywordCoverage } = checkAmazonListing(listing);
+          const covered = keywordCoverage.filter((c) => c.inTitle).length;
           return (
             <Card key={listing.sku}>
               <div className="flex flex-wrap items-start justify-between gap-2">
@@ -33,6 +42,11 @@ export default async function ListingsPage() {
                 </p>
               </div>
               <p className="mt-3 text-sm">{listing.title}</p>
+              {keywordCoverage.length > 0 && (
+                <p className="mt-1 text-sm text-muted">
+                  {covered} of {keywordCoverage.length} target keywords in the title
+                </p>
+              )}
               {issues.length === 0 ? (
                 <p className="mt-3 text-sm text-good">No issues found.</p>
               ) : (
@@ -51,6 +65,14 @@ export default async function ListingsPage() {
                   ))}
                 </ul>
               )}
+              <p className="mt-3 text-sm">
+                <Link
+                  href={`/admin/listings/${encodeURIComponent(listing.sku)}`}
+                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-accent"
+                >
+                  Edit listing
+                </Link>
+              </p>
             </Card>
           );
         })}

@@ -57,6 +57,7 @@ export function sampleListings(): Listing[] {
       description:
         "Fabric braided three core cable in black. Suitable for lamp rewires and pendant lights. Check your fitting's rating before use and have installation work done by a competent person.",
       backendKeywords: "electrical wire textile lighting rewire antique retro lamp cord",
+      targetKeywords: ["braided lamp cable", "fabric lamp flex", "3 core braided cable", "pendant light cable"],
     },
     {
       sku: "FBC-3C-075-3M-GLD",
@@ -66,6 +67,7 @@ export function sampleListings(): Listing[] {
       bullets: ["Gold fabric braid", "3 core 0.75mm"],
       description: "",
       backendKeywords: "",
+      targetKeywords: ["gold braided cable", "braided lamp cable"],
     },
     {
       sku: "FBC-3C-075-5M-BLK",
@@ -82,6 +84,7 @@ export function sampleListings(): Listing[] {
       ],
       description: "Five metres of black fabric braided three core flex for pendant lights and lamps.",
       backendKeywords: "braided electrical wire textile lighting rewire antique retro lamp cord cable flex lead",
+      targetKeywords: ["braided lamp cable", "5 metre pendant cable", "fabric lamp flex"],
     },
   ];
 }

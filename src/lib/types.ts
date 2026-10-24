@@ -33,4 +33,5 @@ export type Listing = {
   bullets: string[];
   description: string;
   backendKeywords: string;
+  targetKeywords: string[]; // search phrases to rank for, most important first
 };

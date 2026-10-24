@@ -10,7 +10,7 @@ const good: ListingDraft = {
 
 describe("checkAmazonListing", () => {
   it("scores a complete listing at 100", () => {
-    expect(checkAmazonListing(good)).toEqual({ score: 100, issues: [] });
+    expect(checkAmazonListing(good)).toEqual({ score: 100, issues: [], keywordCoverage: [] });
   });
 
   it("flags a title over the limit as an error", () => {
@@ -37,5 +37,50 @@ describe("checkAmazonListing", () => {
   it("never scores below zero", () => {
     const r = checkAmazonListing({ title: "", bullets: [], description: "", backendKeywords: "" });
     expect(r.score).toBeGreaterThanOrEqual(0);
+  });
+
+  it("flags promotional wording and disallowed characters in the title", () => {
+    const r = checkAmazonListing({ ...good, title: `${good.title} - Best Seller! Free Shipping` });
+    const messages = r.issues.map((i) => i.message).join(" ");
+    expect(messages).toContain("promotional wording");
+    expect(messages).toContain("disallows: !");
+  });
+
+  it("flags keyword stuffing and ALL-CAPS titles", () => {
+    const stuffed = checkAmazonListing({ ...good, title: `${good.title} Cable Cable Cable` });
+    expect(stuffed.issues.map((i) => i.message).join(" ")).toContain("cable");
+    const caps = checkAmazonListing({ ...good, title: good.title.replace("Braided Fabric Cable", "BRAIDED FABRIC CABLE") });
+    expect(caps.issues.map((i) => i.message).join(" ")).toContain("ALL-CAPS");
+  });
+
+  it("rejects HTML and emoji", () => {
+    expect(checkAmazonListing({ ...good, description: "<b>bold</b>" }).issues.map((i) => i.field)).toContain("formatting");
+    expect(checkAmazonListing({ ...good, bullets: ["one ⭐", "two", "three", "four", "five"] }).issues.map((i) => i.field)).toContain("formatting");
+  });
+
+  it("warns about commas and duplicates in backend keywords", () => {
+    const r = checkAmazonListing({ ...good, backendKeywords: "wire, wire textile" });
+    const messages = r.issues.map((i) => i.message).join(" ");
+    expect(messages).toContain("Separate backend keywords");
+    expect(messages).toContain("repeat: wire");
+  });
+});
+
+describe("keyword coverage", () => {
+  it("matches words in any order and folds plurals and sizes", () => {
+    const r = checkAmazonListing({ ...good, targetKeywords: ["lamp cable braided", "table lamps", "0.75mm flex"] });
+    expect(r.keywordCoverage.map((c) => c.inTitle)).toEqual([true, true, true]);
+    expect(r.issues).toEqual([]);
+  });
+
+  it("warns when the primary keyword is missing from the title", () => {
+    const r = checkAmazonListing({ ...good, targetKeywords: ["textile rewire"] });
+    expect(r.keywordCoverage[0]).toMatchObject({ inTitle: false, inCopy: false, inBackend: true });
+    expect(r.issues.map((i) => i.message)).toEqual(['Primary keyword "textile rewire" is not in the title.']);
+  });
+
+  it("warns about a keyword that appears nowhere", () => {
+    const r = checkAmazonListing({ ...good, targetKeywords: ["braided", "chandelier"] });
+    expect(r.issues.map((i) => i.message)).toEqual(['Keyword "chandelier" does not appear anywhere in the listing.']);
   });
 });

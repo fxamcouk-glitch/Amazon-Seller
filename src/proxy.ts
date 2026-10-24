@@ -32,4 +32,4 @@ function safeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-export const config = { matcher: ["/admin/:path*"] };
+export const config = { matcher: ["/admin/:path*", "/api/admin/:path*"] };
