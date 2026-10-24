@@ -60,6 +60,7 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 ## Done so far
 
 - **Dashboard shell** (branch `claude/charming-bohr-8s2vp7`): Overview (revenue by channel, daily chart, conversion), Listings & SEO (Amazon length and keyword checks with a score), Tracked links (UTM builder with an Amazon Attribution warning). All pages read **sample data** through `src/lib/data.ts`; replace its bodies with Prisma queries and live connectors. Pure logic is covered by `npm test`.
+- **Storefront** (same branch): home, product pages with canonical, Open Graph, Product + Breadcrumb JSON-LD, `sitemap.xml`, `robots.txt`, and a Stripe Checkout route (`/api/checkout`, needs `STRIPE_SECRET_KEY`). Sample catalogue in `src/lib/catalogue.ts`; no product images yet (needed for rich results). Set `SITE_URL` at build time so canonical links and the sitemap use the real domain. Not yet built: order confirmation page, Stripe webhook, order bridge, shipping rates, VAT, cookie consent.
 - Prisma schema for products, listings, tracked links and daily channel stats (not yet migrated; needs `DATABASE_URL`).
 
 - Created the `Amazon-Seller` repo scaffold on branch `claude/zen-archimedes-2bo6xh`: `package.json`, `package-lock.json` and `.gitignore`. There is no application code yet.
@@ -78,11 +79,24 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - Planned flow: store order webhook -> map store SKU to Amazon seller SKU -> preview fulfillability -> create fulfilment order -> poll or listen for tracking -> write the tracking number back to the store and the dashboard.
 - Build it behind the store-connector interface so it works for Shopify now and our own site later.
 
+## Decisions (owner delegated hosting and platform; 2026-10-24)
+
+- **Website:** custom Next.js storefront in this repo, **Stripe Checkout** for payments (hosted by Stripe, so cards, wallets and receipts need no payment code of ours). Rationale: full control of SEO (server-rendered pages, canonical tags, sitemap, Product/Breadcrumb structured data) and a direct Stripe-webhook -> Amazon MCF path with no store platform in between. Trade-off: we build and maintain cart, shipping and VAT handling; Shopify would launch faster. Reversible: the channel/connector layer still supports Shopify.
+- **Dashboard** lives at `/admin`, behind HTTP Basic auth (`ADMIN_PASSWORD`); it fails closed in production when unset. `/admin` and `/api` are disallowed in `robots.txt`.
+- **Hosting:** not yet chosen or deployed. Render is the likely first choice (a Render connector is available in the build environment) with Neon Postgres. Verify current pricing and free-tier limits before committing; some hosts' free plans exclude commercial use.
+- **Brand Registry:** owner believes the brand was registered. Verify in Seller Central that it is still active after reactivation; Amazon Attribution depends on it.
+
+## Existing tools and libraries (found by web search; licences and maintenance NOT verified)
+
+- SP-API clients for Node/TypeScript: [`amazon-sp-api`](https://npmjs.com/package/amazon-sp-api) (handles tokens, report downloads and throttling retries) and [`@scaleleap/selling-partner-api-sdk`](https://github.com/ScaleLeap/selling-partner-api-sdk) (fully typed, but expects you to supply access tokens). Preferred plan: use one of these rather than hand-writing signed requests.
+- Amazon Ads API: an MIT-licensed [Amazon Ads MCP SDK](https://glama.ai/mcp/servers/KuudoAI/amazon_ads_mcp) (openbridge / KuudoAI) covers the Ads API plumbing; no open-source bid optimiser was found, so the PPC rules engine stays ours. `amz-ppc-optimizer` on PyPI works from report files, not the live API.
+- Order bridge: no open-source Shopify/store -> MCF connector found; only paid build-to-order vendors. We build it.
+
 ## Open questions (unanswered)
 
-1. Where should it run: free tiers, an existing paid host or locally only?
-2. Does the account have Brand Registry, which Amazon Attribution needs?
-3. Is the account a Professional selling plan (needed for the private SP-API app)?
+1. Is the account a Professional selling plan (needed for the private SP-API app)?
+2. Is the business VAT registered? Needed before the store shows or charges VAT, and for Stripe tax settings.
+3. Shipping: free, flat rate or MCF-cost based? Checkout currently collects a UK address only and adds no shipping charge.
 
 ## Next steps
 

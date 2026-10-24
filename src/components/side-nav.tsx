@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 import { BarChart3, Link2, ListChecks } from "lucide-react";
 
 const ITEMS = [
-  { href: "/", label: "Overview", icon: BarChart3 },
-  { href: "/listings", label: "Listings & SEO", icon: ListChecks },
-  { href: "/links", label: "Tracked links", icon: Link2 },
+  { href: "/admin", label: "Overview", icon: BarChart3 },
+  { href: "/admin/listings", label: "Listings & SEO", icon: ListChecks },
+  { href: "/admin/links", label: "Tracked links", icon: Link2 },
 ];
 
 export function SideNav() {
@@ -20,7 +20,7 @@ export function SideNav() {
       <p className="px-4 py-4 text-sm font-semibold md:py-6">The Cable Store</p>
       <ul className="flex flex-wrap gap-1 px-2 pb-2 md:flex-col md:pb-0">
         {ITEMS.map(({ href, label, icon: Icon }) => {
-          const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+          const active = href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
           return (
             <li key={href}>
               <Link
