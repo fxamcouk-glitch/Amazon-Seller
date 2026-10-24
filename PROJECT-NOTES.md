@@ -92,11 +92,17 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - Amazon Ads API: an MIT-licensed [Amazon Ads MCP SDK](https://glama.ai/mcp/servers/KuudoAI/amazon_ads_mcp) (openbridge / KuudoAI) covers the Ads API plumbing; no open-source bid optimiser was found, so the PPC rules engine stays ours. `amz-ppc-optimizer` on PyPI works from report files, not the live API.
 - Order bridge: no open-source Shopify/store -> MCF connector found; only paid build-to-order vendors. We build it.
 
+## VAT (answered 2026-10-24)
+
+- The business is **not VAT registered**. So the store must not charge VAT or show VAT-inclusive wording, Stripe tax collection stays off, and no VAT number appears on receipts.
+- Registration is compulsory once rolling 12-month taxable turnover passes the threshold, reported by several secondary sources as £90,000 (registration) with 30 days to register. Not checked on GOV.UK; confirm on [GOV.UK](https://www.gov.uk/vat-registration/when-to-register) before relying on it. Turnover across all channels (Amazon, own site) counts together.
+- Planned dashboard feature: rolling 12-month turnover against the threshold with a warning as it approaches (needs real order history, not the 30-day sample).
+- Ask an accountant whether voluntary registration makes sense (it lets you reclaim VAT on costs but means charging VAT on sales).
+
 ## Open questions (unanswered)
 
 1. Is the account a Professional selling plan (needed for the private SP-API app)?
-2. Is the business VAT registered? Needed before the store shows or charges VAT, and for Stripe tax settings.
-3. Shipping: free, flat rate or MCF-cost based? Checkout currently collects a UK address only and adds no shipping charge.
+2. Shipping: free, flat rate or MCF-cost based? Checkout currently collects a UK address only and adds no shipping charge.
 
 ## Next steps
 
