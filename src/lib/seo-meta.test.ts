@@ -23,6 +23,12 @@ describe("productJsonLd", () => {
     expect(ld.offers.availability).toBe("https://schema.org/OutOfStock");
   });
 
+  it("declares free UK delivery", () => {
+    const d = productJsonLd(PRODUCTS[0]).offers.shippingDetails;
+    expect(d.shippingRate).toMatchObject({ value: "0", currency: "GBP" });
+    expect(d.shippingDestination.addressCountry).toBe("GB");
+  });
+
   it("omits image when the product has none", () => {
     expect("image" in productJsonLd(PRODUCTS[0])).toBe(false);
   });

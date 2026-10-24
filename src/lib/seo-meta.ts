@@ -32,6 +32,12 @@ export function productJsonLd(product: Product) {
       price: (product.pricePence / 100).toFixed(2),
       availability: product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       itemCondition: "https://schema.org/NewCondition",
+      // Free UK delivery on every order. Add deliveryTime once dispatch and transit times are confirmed.
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: { "@type": "MonetaryAmount", value: "0", currency: "GBP" },
+        shippingDestination: { "@type": "DefinedRegion", addressCountry: "GB" },
+      },
     },
   };
 }

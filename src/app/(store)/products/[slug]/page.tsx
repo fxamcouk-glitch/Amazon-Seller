@@ -35,7 +35,7 @@ export default async function ProductPage({ params }: Props) {
       />
       <h1 className="text-2xl font-semibold">{product.name}</h1>
       <p className="mt-2 text-2xl font-semibold tabular-nums">{formatPounds(product.pricePence)}</p>
-      <p className="mt-1 text-sm text-muted">{product.inStock ? "In stock" : "Out of stock"}</p>
+      <p className="mt-1 text-sm text-muted">{product.inStock ? "In stock" : "Out of stock"} · Free UK delivery</p>
 
       {product.description.map((p, i) => (
         <p key={i} className="mt-4 max-w-2xl">{p}</p>

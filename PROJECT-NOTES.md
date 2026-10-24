@@ -99,10 +99,16 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - Planned dashboard feature: rolling 12-month turnover against the threshold with a warning as it approaches (needs real order history, not the 30-day sample).
 - Ask an accountant whether voluntary registration makes sense (it lets you reclaim VAT on costs but means charging VAT on sales).
 
+## Shipping (answered 2026-10-24)
+
+- The owner offers **free delivery** (UK). Checkout adds no shipping charge, the storefront says "Free UK delivery", and product structured data declares a £0 UK shipping rate.
+- Because delivery is free, the **MCF fee per order comes out of margin**. The dashboard's margin view must subtract the per-order MCF fee (and the 1.5% UK fuel and logistics surcharge noted above) so prices can be set to cover it. Current UK MCF rates were not confirmed; take them from Seller Central.
+- Delivery time (dispatch plus transit) is not yet known; add it to the structured data once confirmed.
+
 ## Open questions (unanswered)
 
 1. Is the account a Professional selling plan (needed for the private SP-API app)?
-2. Shipping: free, flat rate or MCF-cost based? Checkout currently collects a UK address only and adds no shipping charge.
+(Shipping is settled: see below.)
 
 ## Next steps
 
