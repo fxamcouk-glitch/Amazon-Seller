@@ -114,6 +114,14 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - The Seller Central account is **now activated** (owner confirmed after trouble with payment and bank verification). Still to confirm: plan type (was Individual), Brand Registry status, and that listings such as ASIN B0CK7CL4LP are active and buyable.
 - Next on the Amazon side, in order: upgrade to Professional, connect the Amazon Selling Partner plugin (new session needed), register as an SP-API developer (primary user), check Brand Registry.
 
+## Amazon API progress (2026-10-26)
+
+- Amazon's AI-agent plugin is **US store only** (Amazon's own "Coming soon to your store" screen), so it cannot be used for the UK account. The API route is the way.
+- Owner created a **Sandbox** app, "TheCable.Store Seller Hub", in Developer Central (Solution Provider Portal). Production was greyed out; Amazon's note says role approval is decided at developer registration. Status of the developer registration and which roles were requested: not yet confirmed.
+- Library chosen: `amazon-sp-api` (MIT, updated 2026-03, handles tokens and throttling, has a sandbox switch). Code: `src/lib/amazon/` and `npm run amazon:check`. Tested with mocks and with fake credentials (fails cleanly at sign-in). **Not yet run with real credentials.**
+- Credentials go in as environment secrets (`SELLING_PARTNER_APP_CLIENT_ID`, `SELLING_PARTNER_APP_CLIENT_SECRET`, `SP_API_REFRESH_TOKEN`; names in `.env.example`), never in the repo or chat. The refresh token comes from Amazon's self-authorization for your own account; whether this works for a sandbox app is unconfirmed.
+- Next: real sandbox check, then Listings Items / Catalog Items import once Production is available.
+
 ## Selling plan (answered 2026-10-24)
 
 - The account is **not on the Professional plan** (so Individual). Per secondary sources ([WorldFirst](https://www.worldfirst.com/uk/blog/global-business-tips/how-much-does-it-cost-to-sell-on-amazon/), [Osome](https://osome.com/uk/blog/amazon-seller-fees/)), Individual has no access to advertising tools, bulk listing or the API; Professional is about £25 a month ex VAT (about £30 if VAT can't be reclaimed, as when not VAT registered) against £0.75 per item sold on Individual, breaking even near 35 units a month. Confirm current prices and what Individual can do on Amazon's UK pricing page.
