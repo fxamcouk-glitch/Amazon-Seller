@@ -10,6 +10,7 @@ database, hosting account), the Amazon Selling Partner API credentials, the Stri
 the owner's computer used to run them.
 
 ## Roles
+- **Incident Management Point of Contact (IMPOC):** the incident lead below. This is the named person Amazon can reach during an incident. They must be readily available; if they will be away or unreachable, name the backup contact here for that period and tell Amazon.
 - **Incident lead:** [owner's full name], [phone], [email]. Decides what to do and makes every
   notification. Has the logins for hosting, database, Stripe and Seller Central.
 - **Backup contact:** [trusted person's name and phone]. Called if the incident lead cannot be
@@ -28,7 +29,8 @@ computer, malware, or a warning from Amazon, the host or Stripe.
 2. **Contain at once.** Revoke or rotate the affected credentials: the Amazon app client secret and
    refresh token (Developer Central and Seller Central), the dashboard password, the database
    password, Stripe keys, and the hosting login. Remove the affected access, then check nothing
-   still uses the old values.
+   still uses the old values. Remove a person's access within 24 hours if they leave or change role,
+   and immediately if a compromise is suspected.
 3. **Assess.** What data was involved, whose, for how long, and is it still exposed? Check the
    hosting provider's access and audit logs where they exist.
 4. **Notify Amazon within 24 hours of detection** if Amazon Information is involved or might be:
