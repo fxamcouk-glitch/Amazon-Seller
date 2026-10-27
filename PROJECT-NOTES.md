@@ -122,6 +122,13 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - Credentials go in as environment secrets (`SELLING_PARTNER_APP_CLIENT_ID`, `SELLING_PARTNER_APP_CLIENT_SECRET`, `SP_API_REFRESH_TOKEN`; names in `.env.example`), never in the repo or chat. The refresh token comes from Amazon's self-authorization for your own account; whether this works for a sandbox app is unconfirmed.
 - Next: real sandbox check, then Listings Items / Catalog Items import once Production is available.
 
+## Developer Profile rejected (2026-10-27)
+
+- Amazon declined SP-API access, naming three areas: an incident response plan with defined roles, 6-month reviews and 24-hour reporting to security@amazon.com (two questions), and network security controls (firewalls, IDS/IPS, anti-virus/anti-malware, network segmentation). The owner had answered No to those and to several others. Appeal = a **new case** with an updated Developer Profile, not reopening the old one.
+- Unknown: which roles were submitted (restricted roles trigger the PII security section). Check "View profile" in Developer Central.
+- Drafts to make the answers true: `docs/incident-response-plan.md` (owner must adopt) and `docs/security-controls.md` (evidence checklist; hosting not chosen yet).
+- Fallback if SP-API approval stays out of reach: use a third-party or Shopify MCF connector for dispatch (it uses the vendor's own Amazon authorisation); manual Seller Central work for listings.
+
 ## Selling plan (answered 2026-10-24)
 
 - The account is **not on the Professional plan** (so Individual). Per secondary sources ([WorldFirst](https://www.worldfirst.com/uk/blog/global-business-tips/how-much-does-it-cost-to-sell-on-amazon/), [Osome](https://osome.com/uk/blog/amazon-seller-fees/)), Individual has no access to advertising tools, bulk listing or the API; Professional is about £25 a month ex VAT (about £30 if VAT can't be reclaimed, as when not VAT registered) against £0.75 per item sold on Individual, breaking even near 35 units a month. Confirm current prices and what Individual can do on Amazon's UK pricing page.
