@@ -63,9 +63,22 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - The Amazon Brand Store suggests the account **has Brand Registry**, because Brand Stores need it. That would make Amazon Attribution possible. Confirm in Seller Central.
 - Fix to consider: point the domain at the new dashboard or Shopify store with a valid certificate, or use a proper 301 redirect instead of a frame.
 
+## Seller Central snapshot (2026-11-19, read through Claude in Chrome)
+
+- The account **TheCable.Store** (UK) is **active**, with account health **Healthy**.
+- **22 of 805 products are active.** That leaves 783 inactive or suppressed, which is the biggest listings problem to sort out first.
+- Inventory performance index (IPI) is 382 out of 1,000, up 13 points.
+- 1 open order. Finance balance £146.
+- Last 7 days: £77.97 in product sales from 3 units, with 33.3% conversion.
+
+## Working setup
+
+- Claude Code runs on the owner's Mac with Claude in Chrome connected. Remote Control lets sessions be driven from claude.ai/code or the phone.
+- Start it with `scripts/Start Claude (phone and web).command`, or run `claude remote-control --chrome`. Each session works in its own Chrome tab group.
+
 ## Open questions (unanswered)
 
-1. Is the Seller Central account active, suspended or closed?
+1. ~~Is the Seller Central account active, suspended or closed?~~ It's active and Healthy (see the snapshot above).
 2. How did Shopify hand orders to Amazon: the MCF app, a manual link or a third-party connector?
 3. Where should it run: free tiers, an existing paid host or locally only?
 4. Does the account have Brand Registry, which Amazon Attribution needs? Probably yes, since an Amazon Brand Store exists (see above).
