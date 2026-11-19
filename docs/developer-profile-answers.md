@@ -42,7 +42,7 @@ Restricted roles justification (500 chars): "Not applicable. We are not requesti
 | Outside parties with whom Amazon Information is shared | Name the real providers: Anthropic (listing text only), the hosting and database providers | Fill in provider names |
 | External non-Amazon sources of Amazon Information | "None. We retrieve Amazon Information only from Amazon's Selling Partner API." | True if no third-party data feed is used |
 | How long PII is retained | Only "Less than 31 days" if no Amazon buyer PII is ever requested or stored | True only if no restricted role |
-| Documented data handling and privacy policies | A written policy adopted by the owner (not yet written) | **BLOCKED**: answer No until it exists |
+| Documented data handling and privacy policies | `docs/data-handling-policy.md` read, brackets filled, adopted by the owner | **BLOCKED** until adopted; answer No until then |
 | Network protection for databases, file servers and developer endpoints (text) | Real settings of the chosen host and database and the owner's computer | **BLOCKED** until hosting chosen |
 | Identifying people with access, need-to-know (text) | Draft in chat is accurate for a one-person business | Check |
 | Monitoring personal devices (text) | Draft in chat is accurate; no automated monitoring exists | Check |
