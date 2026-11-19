@@ -16,5 +16,8 @@ Not named in the rejection, so not claimed here: encryption at rest, audit-log r
 environment, vulnerability scans, code scanning. Do not assume they are not needed; if Amazon
 raises them, treat them the same way.
 
-Next step: choose the host and database, then fill in the Evidence column from their own
-documentation and settings pages.
+Hosting decision (2026-11-19): **Render + Cloudflare**, in a **separate Render workspace**. See
+`docs/render-cloudflare-setup.md` for the steps and the evidence to capture. Still not verified:
+every row above stays "Not verified" until the setup exists and you have saved the evidence.
+IDS/IPS in particular: neither Render nor Cloudflare was found to claim IDS/IPS; ask Amazon
+whether the managed platform and WAF count as "equivalent" before relying on it.

@@ -129,6 +129,12 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - Drafts to make the answers true: `docs/incident-response-plan.md` (owner must adopt) and `docs/security-controls.md` (evidence checklist; hosting not chosen yet).
 - Fallback if SP-API approval stays out of reach: use a third-party or Shopify MCF connector for dispatch (it uses the vendor's own Amazon authorisation); manual Seller Central work for listings.
 
+## Hosting decision (2026-11-19)
+
+- Owner chose **Render + Cloudflare**. Render account found with one shared workspace holding unrelated projects and no databases; plan is a **separate workspace** for this business (private network is shared per workspace). Nothing created yet. Setup steps: `docs/render-cloudflare-setup.md`.
+- Open: domain, workspace and costs approval, Amazon's answer on "equivalent" controls, move storage from file to database before real data.
+- Claude in Chrome was installed by the owner but connects only to a session started with it; this session never had it.
+
 ## Selling plan (answered 2026-10-24)
 
 - The account is **not on the Professional plan** (so Individual). Per secondary sources ([WorldFirst](https://www.worldfirst.com/uk/blog/global-business-tips/how-much-does-it-cost-to-sell-on-amazon/), [Osome](https://osome.com/uk/blog/amazon-seller-fees/)), Individual has no access to advertising tools, bulk listing or the API; Professional is about £25 a month ex VAT (about £30 if VAT can't be reclaimed, as when not VAT registered) against £0.75 per item sold on Individual, breaking even near 35 units a month. Confirm current prices and what Individual can do on Amazon's UK pricing page.
