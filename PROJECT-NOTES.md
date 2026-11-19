@@ -135,6 +135,10 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - Open: domain, workspace and costs approval, Amazon's answer on "equivalent" controls, move storage from file to database before real data.
 - Claude in Chrome was installed by the owner but connects only to a session started with it; this session never had it.
 
+## Handoff
+
+`docs/next-session-prompt.md` is a paste-in prompt for a new session started with Claude in Chrome (a session only gets Chrome when it starts). It lists current state, hard rules and the task order.
+
 ## Selling plan (answered 2026-10-24)
 
 - The account is **not on the Professional plan** (so Individual). Per secondary sources ([WorldFirst](https://www.worldfirst.com/uk/blog/global-business-tips/how-much-does-it-cost-to-sell-on-amazon/), [Osome](https://osome.com/uk/blog/amazon-seller-fees/)), Individual has no access to advertising tools, bulk listing or the API; Professional is about £25 a month ex VAT (about £30 if VAT can't be reclaimed, as when not VAT registered) against £0.75 per item sold on Individual, breaking even near 35 units a month. Confirm current prices and what Individual can do on Amazon's UK pricing page.
