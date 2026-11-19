@@ -54,12 +54,21 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - Dependencies are on **Next.js 16.4.3**, because 16.3.0 has critical security advisories. `npm audit` reports 0 vulnerabilities.
 - Note: `next@16` has breaking changes from older versions. Read `node_modules/next/dist/docs/` before writing code.
 
+## Brand and domain: TheCable.Store (checked 2026-11-19)
+
+- The brand is **The Cable Store**, at the domain `thecable.store`. Its page description is "The Cable Store - 3 Core Lighting Cable".
+- Over plain HTTP, the domain is a **frame-forwarding page** around an **Amazon Brand Store**: `amazon.co.uk/stores/TheCableStore/...`. It does not point at Shopify.
+- **HTTPS is broken.** `https://thecable.store` and `https://www.` both fail the TLS handshake. Most browsers now try HTTPS first, so many visitors see an error.
+- The forwarding page also embeds an ASP.NET "Server Error in '/' Application" page. That looks like the registrar's forwarding service failing.
+- The Amazon Brand Store suggests the account **has Brand Registry**, because Brand Stores need it. That would make Amazon Attribution possible. Confirm in Seller Central.
+- Fix to consider: point the domain at the new dashboard or Shopify store with a valid certificate, or use a proper 301 redirect instead of a frame.
+
 ## Open questions (unanswered)
 
 1. Is the Seller Central account active, suspended or closed?
 2. How did Shopify hand orders to Amazon: the MCF app, a manual link or a third-party connector?
 3. Where should it run: free tiers, an existing paid host or locally only?
-4. Does the account have Brand Registry, which Amazon Attribution needs?
+4. Does the account have Brand Registry, which Amazon Attribution needs? Probably yes, since an Amazon Brand Store exists (see above).
 
 ## Next steps
 
