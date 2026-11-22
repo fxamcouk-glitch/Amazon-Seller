@@ -76,6 +76,100 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - Claude Code runs on the owner's Mac with Claude in Chrome connected. Remote Control lets sessions be driven from claude.ai/code or the phone.
 - Start it with `scripts/Start Claude (phone and web).command`, or run `claude remote-control --chrome`. Each session works in its own Chrome tab group.
 
+## SP-API developer access (checked 2026-11-19)
+
+- A developer profile was **already submitted on 2026-10-26** (case 22816410801 in the Solution Provider Portal), and an app **"TheCable.Store Seller Hub"** exists in **Sandbox** status.
+- Amazon **rejected the profile**: "not eligible for SP-API access". The three security answers it flagged:
+  1. The incident response plan doesn't include reporting incidents involving Amazon data to security@amazon.com within 24 hours.
+  2. Missing network security controls: firewalls, IDS/IPS, anti-virus/anti-malware, network segmentation.
+  3. No incident response plan with defined roles, 6-month reviews and 24-hour notification.
+- To appeal: don't reopen the case. Submit a new case with updated profile answers at https://sellercentral.amazon.com/developer/register.
+- The controls must genuinely exist before answering "yes".
+- **Resubmitted on 2026-11-21:** case **23534405411**, status "Work in progress". New production app clients are blocked until the review finishes.
+  - Private Solution Provider, with 5 non-restricted roles: Product Listing, Inventory and Order Tracking, Amazon Fulfillment, Finance and Accounting, Brand Analytics.
+  - All 7 security answers are Yes, backed by `docs/INCIDENT-RESPONSE-PLAN.md` (next review 2027-05-20).
+  - Declared sharing: Anthropic receives only our own listing text. Render and Neon host the data.
+- **APPROVED on 2026-11-21 at 08:31 GMT** (case 23534405411). Global marketplace access for the 5 roles. Next step: register the production SP-API app and get its LWA credentials. Keep the credentials out of the repo.
+- **Live app created on 2026-11-21:**
+  - Name: "TheCable.Store Seller Hub Live"
+  - App ID: `amzn1.sp.solution.c778b05d-550d-47fd-8409-058a891d9eb5`
+  - Type: SP API, Production, Sellers
+  - Roles: the 5 approved roles
+  - Customer data (PII) access delegated to other developers: none
+  - Status: Draft (normal for a private app until it is self-authorised)
+  - The old sandbox app (`...27594265...`) is kept for testing.
+- **Commitments made in the form, which we must keep:**
+  - Mac firewall, FileVault and security updates are on.
+  - Passwords of at least 12 characters with MFA on every account, changed every year.
+  - No credentials in code.
+  - Test in the sandbox before using real data.
+  - Each listing change is approved by the owner before it is sent.
+
+## First live SP-API results (2026-11-21, Amazon.co.uk)
+
+- The connection works. The account participates in 17 marketplaces (UK, the EU marketplaces, the UAE and Saudi Arabia, plus "Non-Amazon" channels), with no suspended listings.
+- The Listings API returns **57 UK listings, not 805.** 14 are buyable and 43 are not:
+  - **38 are out of FBA stock.** Restocking is the main fix, not editing the listings.
+  - **3 have FBA stock but aren't buyable and show no errors:** the Black/White zig-zag 3m, 5m and 20m. Check their price and offer in Seller Central.
+  - **6 have catalogue-match errors:**
+    - 8541: the part number or EAN matches 2 ASINs, or the data conflicts with the catalogue.
+    - 100898: the brand doesn't match the variation parent B0CT1M7MVW.
+  - **2 have no FBA record:** `TCS-3CORE-` (the variation parent) and `CERAMIC-E27-LAMPHOLDER-`.
+- FBA (UK) holds 178 SKUs and 118 sellable units, with nothing inbound. 123 of those SKUs have no current listing, and 4 of them still hold stock: JP-9R46-OV2U (13), TCS-RD-3-RED-10M (4), -20M (3) and -5M (2).
+- **Still unexplained:** where the "805 products" in Seller Central come from. Possibly every marketplace, or closed or archived listings.
+- **Fixes applied on 2026-11-21 with owner approval** (`scripts/fix-listings.ts`). All 9 were ACCEPTED by Amazon:
+  - Restarted the offers on the 3 old zig-zag SKUs, which expired on 2025-06-20.
+  - Set part_number to the catalogue value on RED-50M and LINEN/ZZ-3M.
+  - Relisted the stranded stock on TCS-RD-3-RED-5M/10M/20M and JP-9R46-OV2U (the Black 3m).
+- **2026-11-22:**
+  - Linen ZZ 5m, 10m and 50m: part_number set to the catalogue value. The 8541 errors cleared.
+  - Zig-zag offers resent with `end_at: null`. The first patch had kept the expired end date.
+  - The 4 stranded-stock SKUs are BUYABLE. Buyable listings went from 14 to 18.
+- **SEO rewrite applied on 2026-11-22 to all 50 cable listings** (`scripts/seo-listings.ts`), with owner approval. All were ACCEPTED. It sets:
+  - New title, with "The Cable Store" as the brand in the title
+  - 5 bullets carrying the correct colour and round/twisted construction. Previously all 50 said "Linen Zig Zag Round".
+  - A UK-spelling description
+  - Backend keywords (previously empty)
+  - Size changed from "Meters" to "Metres"
+  - "Weight 0.55 kg/m" was dropped as implausible. **Ask the owner for the real figure.**
+  - "CE marked, made in the EU" was kept from the original listings.
+  - The 5 ceramic listings are not done yet.
+- **Brand Store draft built on 2026-11-22** in the Ads console Store builder, as the new version **"Scandi Light 2026"**. It is NOT submitted; the live version is unchanged. The Home page has:
+  - A new 3000×600 banner made from 3 braid close-ups (built locally with `stitch.swift`)
+  - An intro text tile
+  - A product grid of 9 colours (one ASIN per colour, out-of-stock hidden)
+  - Specification, length-guide and lamp-holder text tiles
+  - The existing 4 lamp-holder tiles
+  - The meta description set to Fable's 157-character version
+  - Extra pages built later the same day, all top level:
+    - **Fabric Lighting Cable:** text plus a grid of all 45 cable ASINs, out-of-stock hidden.
+    - **Ceramic Lamp Holders:** text plus a grid of the 4 holder ASINs.
+    - **How to Choose:** length, styles and specification text tiles.
+    - Each page has its own meta description.
+  - **Submitted on 2026-11-22: "When approved – No end date"**, pending review until 23 Nov. The first submission had defaulted to a temporary version ending at midnight; it was cancelled and resubmitted with "No end date" ticked. When approved, it replaces the old live version.
+  - Blocking issue fixed before submission: every page needs a link (added "Shop all fabric lighting cable" on How to Choose). The remaining warnings (capitals, "numeric pricing", "Store" in the brand name) are false positives.
+  - Gotcha: new product grids start with "Hide out-of-stock" already ticked, so clicking it unticks it. All 3 grids were verified ticked.
+- **Listings changed on 2026-11-22 (second pass, owner approved):**
+  - All 50 cables: title now puts colour and length up front ("…Flex 0.75mm², Red Round, 5m – …"); "An oatmeal"; "also available" lists only the other lengths; Fable's backend terms.
+  - The official UK schema shows the title limit is 200, not 75, and has **no Item Highlights attribute**.
+  - Cable parent `TCS-3CORE-` rewritten.
+  - All 5 ceramic listings rewritten from their own facts, with the wall-light brand set to "The Cable Store". All accepted.
+  - Old zig-zag SKUs: 3M, 5M and 20M still hold stock (10 units). 10M and 50M were empty and were **deleted on 2026-11-22 with the owner's explicit confirmation** (Amazon ACCEPTED both).
+- **Fable live-listing audit (2026-11-22):**
+  - Restock is the top priority.
+  - Titles are 140–159 characters against a reported **75-character limit from 27 July 2026** (plus a new "Item Highlights" field). Amazon may AI-rewrite titles, so check "Review Listing Changes".
+  - Duplicate SKUs on 9 ASINs (the old `RD-3CORE- BLACK/WHITE/ZZ-*` SKUs and the stranded `TCS-RD-3-RED-*` and `JP-*` SKUs).
+  - Parent `TCS-3CORE-` still carries old content.
+  - "A oatmeal" typo.
+  - Bullet 3 lists its own length as "also available".
+  - Twisted cable's H03VV-F designation: **the owner confirmed on 2026-11-22 that it is the same as round**, so no change is needed.
+  - Ceramic listings need rewriting.
+  - Fable supplied 75-character title templates, Item Highlights, backend terms and ceramic copy.
+- **Still open, needing Seller Support:**
+  - Linen ZZ 5m, 10m and 50m: the catalogue wrongly holds the 3m part number.
+  - B07PF1SSHQ (Oatmeal 5m) has the catalogue brand "TheCable.Store" instead of "The Cable Store". This breaks the variation family and causes the warnings on the parent TCS-3CORE-.
+- To re-run the checks: `npm run spapi:check`, `npm run listings:audit`, then `npm run inventory:check`.
+
 ## Open questions (unanswered)
 
 1. ~~Is the Seller Central account active, suspended or closed?~~ It's active and Healthy (see the snapshot above).

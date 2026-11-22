@@ -10,7 +10,15 @@
     "test": "vitest run",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:deploy": "prisma migrate deploy"
+    "db:deploy": "prisma migrate deploy",
+    "spapi:check": "tsx scripts/check-spapi.ts",
+    "listings:audit": "tsx scripts/audit-listings.ts",
+    "inventory:check": "tsx scripts/check-inventory.ts",
+    "listing:inspect": "tsx scripts/inspect-listing.ts",
+    "catalog:inspect": "tsx scripts/inspect-catalog.ts",
+    "listings:fix": "tsx scripts/fix-listings.ts",
+    "listings:export": "tsx scripts/export-listings.ts",
+    "listings:seo": "tsx scripts/seo-listings.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.122.0",
