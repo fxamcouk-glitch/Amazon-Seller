@@ -192,3 +192,9 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - Still open: the support case about the Oatmeal 5m brand and the Linen part numbers was never sent.
 - Invoicing (2026-11-23): the business is not VAT registered. VAT registration exemption is declared in Seller Central, so Amazon now creates receipts for every order automatically. The easybill GmbH app's access is disabled under Manage Your Apps (it can be re-authorised). The owner cancelled the easybill subscription on 2026-11-23. A check that receipts appear on new orders is scheduled for 2026-11-26.
 - Backlog check (2026-11-23): only one order in the last 365 days was missing an invoice: 205-1438158-3403546 (8 Jun 2026, Amazon Business, £11.99). A receipt (TCS-R-20260608-01, brand-first, no address, company name and number in the footer, "no VAT charged") was uploaded and is pending Amazon's processing. A copy is in ~/Documents/TheCable.Store/receipts/. Merchant-fulfilled orders: none missing.
+- 2026-11-23 evening:
+  - Sales history is now available via `scripts/sales-by-sku.ts` (Orders API, no buyer data): 79 orders and 93 units in 12 months.
+  - Restock plan saved in `docs/RESTOCK-PLAN-2026-11.md`.
+  - The IP54 wall light is merchant-fulfilled (12 units at home).
+  - Ceramic A+ draft "Ceramic lighting range" (23607a5f-9a51-4097-98e3-dd633267f04d) built with `scripts/aplus-ceramics.ts`, validated and linked to 4 ASINs. NOT submitted.
+  - Support case drafted (Linen ZZ 5m/10m/50m part numbers, Oatmeal 5m brand); waiting for owner approval to send.
