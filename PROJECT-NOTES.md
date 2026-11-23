@@ -182,3 +182,11 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 1. Answer the open questions.
 2. Scaffold the Next.js app and a Prisma schema for products, listings and tracked links.
 3. Build the listings and SEO module, then the tracking collector, then PPC, then the Meta Ads connection.
+
+## Status update (2026-11-23)
+
+- A+ content "Fabric lighting cable range" is approved and published on 44 cable ASINs, with the Brand Store logo (`scripts/aplus-cables.ts`).
+- The product video is submitted on the same 44 ASINs and waiting for Amazon's review.
+- Orphan SKU RD-3CORE-BLACK-20M (B07SQBD8N6) is deleted (`scripts/delete-listing.ts`).
+- The advertising plan is saved in `docs/ADVERTISING-PLAN.md`; nothing is running yet. Restock first.
+- Still open: the support case about the Oatmeal 5m brand and the Linen part numbers was never sent.
