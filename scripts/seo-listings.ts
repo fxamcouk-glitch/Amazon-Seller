@@ -31,7 +31,7 @@ type Row = {
 
 // Fable audit 2026-11-22: avoid repeating title/bullet words, add braided/wire/3core variants.
 const KEYWORDS =
-  "braided flex lamp wire cord cloth covered textile woven coloured electric 3core three vintage retro industrial rewire lampshade bulb holder light fitting flexible metre meter";
+  "braided flex lamp wire cord cloth covered textile woven silk coloured electric 3core three vintage retro industrial rewire lampshade bulb holder light fitting flexible metre meter";
 const LENGTHS = [3, 5, 10, 20, 50];
 
 function joinList(xs: number[]) {
