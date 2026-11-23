@@ -190,3 +190,4 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - Orphan SKU RD-3CORE-BLACK-20M (B07SQBD8N6) is deleted (`scripts/delete-listing.ts`).
 - The advertising plan is saved in `docs/ADVERTISING-PLAN.md`; nothing is running yet. Restock first.
 - Still open: the support case about the Oatmeal 5m brand and the Linen part numbers was never sent.
+- Invoicing (2026-11-23): the business is not VAT registered. VAT registration exemption is declared in Seller Central, so Amazon now creates receipts for every order automatically. The easybill GmbH app's access is disabled under Manage Your Apps (it can be re-authorised). The owner still needs to cancel the easybill subscription. A check that receipts appear on new orders is scheduled for 2026-11-26.
