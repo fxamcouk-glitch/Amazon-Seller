@@ -196,5 +196,5 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
   - Sales history is now available via `scripts/sales-by-sku.ts` (Orders API, no buyer data): 79 orders and 93 units in 12 months.
   - Restock plan saved in `docs/RESTOCK-PLAN-2026-11.md`.
   - The IP54 wall light is merchant-fulfilled (12 units at home).
-  - Ceramic A+ draft "Ceramic lighting range" (23607a5f-9a51-4097-98e3-dd633267f04d) built with `scripts/aplus-ceramics.ts`, validated and linked to 4 ASINs. NOT submitted.
+  - Ceramic A+ "Ceramic lighting range" (23607a5f-9a51-4097-98e3-dd633267f04d) built with `scripts/aplus-ceramics.ts` and linked to 4 ASINs. Submitted on the owner's instruction; approved and published 2026-11-24.
   - Support case drafted (Linen ZZ 5m/10m/50m part numbers, Oatmeal 5m brand); waiting for owner approval to send.
