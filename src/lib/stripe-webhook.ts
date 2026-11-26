@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import type { PrismaClient } from "@/generated/prisma/client";
+import type { ProductStore } from "./catalogue";
 import { recordPaidOrder } from "./orders";
 
 export type WebhookOutcome = { status: number; body: Record<string, unknown> };
@@ -14,8 +15,9 @@ export async function handleStripeWebhook(args: {
   secret: string;
   db: PrismaClient;
   env?: Record<string, string | undefined>;
+  products?: Pick<ProductStore, "getBySku">;
 }): Promise<WebhookOutcome> {
-  const { rawBody, signature, secret, db, env } = args;
+  const { rawBody, signature, secret, db, env, products } = args;
   if (!signature) return { status: 400, body: { error: "Missing signature" } };
 
   let event: Stripe.Event;
@@ -28,7 +30,7 @@ export async function handleStripeWebhook(args: {
   if (!PAID_EVENTS.has(event.type)) return { status: 200, body: { received: true, ignored: event.type } };
 
   try {
-    const result = await recordPaidOrder(db, event.data.object as Stripe.Checkout.Session, env);
+    const result = await recordPaidOrder(db, event.data.object as Stripe.Checkout.Session, env, products);
     await db.stripeEvent.createMany({ data: [{ id: event.id, type: event.type }], skipDuplicates: true });
     return { status: 200, body: { received: true, result } };
   } catch (error) {

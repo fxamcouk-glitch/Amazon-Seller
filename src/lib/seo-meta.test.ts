@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PRODUCTS } from "./catalogue";
+import { SAMPLE_PRODUCTS as PRODUCTS } from "./catalogue";
 import { DESCRIPTION_MAX, TITLE_MAX, breadcrumbJsonLd, breadcrumbTrail, fullTitle, jsonLdString, productJsonLd, truncate } from "./seo-meta";
 
 describe("truncate", () => {

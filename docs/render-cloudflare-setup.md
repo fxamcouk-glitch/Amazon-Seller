@@ -51,8 +51,10 @@ control is about. Do not deploy into "My Workspace".
 ## 3. Before this can carry real data
 Listings now use Postgres whenever `DATABASE_URL` is set (without it the app falls back to a local
 file, which is only for development). The schema and first migration are in `prisma/`. The
-product catalogue is still in code (`src/lib/catalogue.ts`); move it to the database before the
-catalogue changes often. Make sure `DATABASE_URL` is set on Render before real data goes in.
+product catalogue is now in the database too: add and edit products at `/admin/products`. A new
+database starts empty (the shop says products are coming soon) and is never filled with sample
+data automatically. Pages that read products are made on request, because the database is not
+reachable while Render builds the site. Make sure `DATABASE_URL` is set on Render before real data goes in.
 
 ## 4. Evidence to capture for Amazon (fill `docs/security-controls.md`)
 For each control, save a dated screenshot or settings export in a private folder, not the repo:

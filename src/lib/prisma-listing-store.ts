@@ -77,9 +77,11 @@ export class PrismaListingStore implements ListingStore {
     return this.db.$transaction(async (tx) => {
       const { count } = await tx.listing.deleteMany({ where: { channel: AMAZON, product: { sku } } });
       if (count === 0) return false;
-      // Drop the product too once no channel lists it, so SKUs can be reused cleanly.
-      const left = await tx.listing.count({ where: { product: { sku } } });
-      if (left === 0) await tx.product.deleteMany({ where: { sku } });
+      // Drop the product too, but only when it is nothing but an Amazon listing. A product that has
+      // a shop page or a price belongs to the website as well and must stay.
+      await tx.product.deleteMany({
+        where: { sku, slug: null, published: false, pricePence: 0, listings: { none: {} } },
+      });
       return true;
     });
   }

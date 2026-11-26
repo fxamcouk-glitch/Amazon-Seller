@@ -1,7 +1,7 @@
 import type Stripe from "stripe";
 import type { PrismaClient } from "@/generated/prisma/client";
 import { loadBusinessDetails, type BusinessDetails } from "./business";
-import { getProductBySku } from "./catalogue";
+import { productStore, type ProductStore } from "./catalogue";
 import { buildInvoicePdf, type InvoiceOrder } from "./invoice";
 
 export class MissingBusinessDetails extends Error {
@@ -41,12 +41,13 @@ export async function recordPaidOrder(
   db: PrismaClient,
   session: Stripe.Checkout.Session,
   env: Record<string, string | undefined> = process.env,
+  products: Pick<ProductStore, "getBySku"> = productStore,
 ): Promise<RecordResult> {
   if (session.payment_status !== "paid") return { status: "ignored", reason: "session is not paid" };
 
   const sku = session.metadata?.sku;
   const quantity = Number(session.metadata?.quantity);
-  const product = sku ? getProductBySku(sku) : undefined;
+  const product = sku ? await products.getBySku(sku) : undefined;
   if (!product || !Number.isInteger(quantity) || quantity < 1) {
     console.error(`Paid Stripe session ${session.id} does not match a known product; no order recorded`);
     return { status: "ignored", reason: "unrecognised product" };

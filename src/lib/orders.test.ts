@@ -3,14 +3,15 @@ import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { createDb } from "./db";
 import { MissingBusinessDetails, ensureInvoice, getInvoicePdf, recordPaidOrder } from "./orders";
 import { handleStripeWebhook } from "./stripe-webhook";
-import { PRODUCTS } from "./catalogue";
+import { SAMPLE_PRODUCTS } from "./catalogue";
+import { PrismaProductStore } from "./prisma-product-store";
 
 // Database tests run only when TEST_DATABASE_URL points at a disposable Postgres database.
 const url = process.env.TEST_DATABASE_URL;
 const db = url ? createDb(url) : undefined;
 
 const env = { BUSINESS_NAME: "TheCable.Store", BUSINESS_ADDRESS: "1 Example Street|Exampleton|EX1 2MP", BUSINESS_EMAIL: "hello@example.com" };
-const product = PRODUCTS[0];
+const product = SAMPLE_PRODUCTS[0];
 
 function session(id: string, overrides: Partial<Stripe.Checkout.Session> = {}): Stripe.Checkout.Session {
   return {
@@ -56,17 +57,26 @@ describe("handleStripeWebhook signatures", () => {
 });
 
 describe.skipIf(!db)("orders and invoices (Postgres)", () => {
+  const products = new PrismaProductStore(db!);
+  const record = (s: Stripe.Checkout.Session, e: Record<string, string | undefined> = env) => recordPaidOrder(db!, s, e, products);
+
   beforeEach(async () => {
     await db!.invoice.deleteMany();
     await db!.orderItem.deleteMany();
     await db!.order.deleteMany();
     await db!.invoiceCounter.deleteMany();
     await db!.stripeEvent.deleteMany();
+    await db!.listing.deleteMany();
+    await db!.product.deleteMany();
+    await products.save({
+      sku: product.sku, name: product.name, displayName: product.name, slug: product.slug, pricePence: product.pricePence,
+      costPence: 0, summary: product.summary, description: product.description, specs: product.specs, inStock: true, published: true, image: null,
+    });
   });
   afterAll(async () => db?.$disconnect());
 
   it("records a paid order with items, address and a numbered invoice PDF", async () => {
-    const result = await recordPaidOrder(db!, session("cs_test_a"), env);
+    const result = await record(session("cs_test_a"), env);
     expect(result).toMatchObject({ status: "recorded" });
     const order = await db!.order.findUniqueOrThrow({ where: { stripeSessionId: "cs_test_a" }, include: { items: true, invoice: true } });
     expect(order).toMatchObject({ customerName: "Zoe Brown", customerEmail: "zoe@example.com", shipPostcode: "BF1 9AA", totalPence: product.pricePence * 2, shippingPence: 0 });
@@ -77,30 +87,30 @@ describe.skipIf(!db)("orders and invoices (Postgres)", () => {
   });
 
   it("is idempotent: the same session twice makes one order and one invoice", async () => {
-    await recordPaidOrder(db!, session("cs_test_b"), env);
-    const again = await recordPaidOrder(db!, session("cs_test_b"), env);
+    await record(session("cs_test_b"), env);
+    const again = await record(session("cs_test_b"), env);
     expect(again.status).toBe("exists");
     expect(await db!.order.count()).toBe(1);
     expect(await db!.invoice.count()).toBe(1);
   });
 
   it("handles two simultaneous deliveries of the same webhook", async () => {
-    const results = await Promise.all([recordPaidOrder(db!, session("cs_test_c"), env), recordPaidOrder(db!, session("cs_test_c"), env)]);
+    const results = await Promise.all([record(session("cs_test_c"), env), record(session("cs_test_c"), env)]);
     expect(results.every((r) => r.status !== "ignored")).toBe(true);
     expect(await db!.order.count()).toBe(1);
     expect(await db!.invoice.count()).toBe(1);
   });
 
   it("numbers invoices 1, 2, 3 across orders", async () => {
-    await recordPaidOrder(db!, session("cs_test_d1"), env);
-    await recordPaidOrder(db!, session("cs_test_d2"), env);
-    await recordPaidOrder(db!, session("cs_test_d3"), env);
+    await record(session("cs_test_d1"), env);
+    await record(session("cs_test_d2"), env);
+    await record(session("cs_test_d3"), env);
     const numbers = (await db!.invoice.findMany({ orderBy: { number: "asc" } })).map((i) => i.number);
     expect(numbers).toEqual([1, 2, 3]);
   });
 
   it("keeps the order, and leaves no gap in numbering, when business details are missing", async () => {
-    const result = await recordPaidOrder(db!, session("cs_test_e"), {});
+    const result = await record(session("cs_test_e"), {});
     expect(result).toMatchObject({ status: "recorded", invoiceError: expect.stringContaining("BUSINESS_NAME") });
     expect(await db!.order.count()).toBe(1);
     expect(await db!.invoice.count()).toBe(0);
@@ -111,9 +121,9 @@ describe.skipIf(!db)("orders and invoices (Postgres)", () => {
   });
 
   it("ignores unpaid sessions and products it does not know", async () => {
-    expect(await recordPaidOrder(db!, session("cs_test_f", { payment_status: "unpaid" }), env)).toMatchObject({ status: "ignored" });
-    expect(await recordPaidOrder(db!, session("cs_test_g", { metadata: { sku: "NOPE", quantity: "1" } }), env)).toMatchObject({ status: "ignored" });
-    expect(await recordPaidOrder(db!, session("cs_test_h", { metadata: { sku: product.sku, quantity: "0" } }), env)).toMatchObject({ status: "ignored" });
+    expect(await record(session("cs_test_f", { payment_status: "unpaid" }), env)).toMatchObject({ status: "ignored" });
+    expect(await record(session("cs_test_g", { metadata: { sku: "NOPE", quantity: "1" } }), env)).toMatchObject({ status: "ignored" });
+    expect(await record(session("cs_test_h", { metadata: { sku: product.sku, quantity: "0" } }), env)).toMatchObject({ status: "ignored" });
     expect(await db!.order.count()).toBe(0);
   });
 
@@ -121,8 +131,8 @@ describe.skipIf(!db)("orders and invoices (Postgres)", () => {
     const secret = "whsec_integration";
     const payload = JSON.stringify({ id: "evt_int_1", object: "event", type: "checkout.session.completed", data: { object: session("cs_test_i") } });
     const header = Stripe.webhooks.generateTestHeaderString({ payload, secret });
-    const first = await handleStripeWebhook({ rawBody: payload, signature: header, secret, db: db!, env });
-    const second = await handleStripeWebhook({ rawBody: payload, signature: header, secret, db: db!, env });
+    const first = await handleStripeWebhook({ rawBody: payload, signature: header, secret, db: db!, env, products });
+    const second = await handleStripeWebhook({ rawBody: payload, signature: header, secret, db: db!, env, products });
     expect([first.status, second.status]).toEqual([200, 200]);
     expect(await db!.order.count()).toBe(1);
     expect(await db!.stripeEvent.count()).toBe(1);

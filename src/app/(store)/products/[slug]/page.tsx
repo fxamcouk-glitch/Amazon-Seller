@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PRODUCTS, getProduct } from "@/lib/catalogue";
+import { cache } from "react";
+import { productStore } from "@/lib/catalogue";
 import { formatPounds } from "@/lib/stats";
 import { DESCRIPTION_MAX, breadcrumbJsonLd, breadcrumbTrail, fullTitle, jsonLdString, productJsonLd, productPath, truncate } from "@/lib/seo-meta";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
-  return PRODUCTS.map((p) => ({ slug: p.slug }));
-}
+// Products live in the database, which is not reachable while the site is being built, so these
+// pages are made on request. `cache` lets the page and its metadata share one lookup per request.
+export const dynamic = "force-dynamic";
+const getProduct = cache((slug: string) => productStore.getPublishedBySlug(slug));
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const product = getProduct((await params).slug);
+  const product = await getProduct((await params).slug);
   if (!product) return {};
   const title = fullTitle(product.name);
   const description = truncate(product.summary, DESCRIPTION_MAX);
@@ -25,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage({ params }: Props) {
-  const product = getProduct((await params).slug);
+  const product = await getProduct((await params).slug);
   if (!product) notFound();
 
   const trail = breadcrumbTrail(product);

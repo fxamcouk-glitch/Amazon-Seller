@@ -20,14 +20,27 @@ enum OrderStatus {
   REFUNDED
 }
 
+// One product per SKU. `name` is the internal name (also used for Amazon listings). The fields below
+// it are only for the website: a product appears in the shop only when `published` is true.
 model Product {
-  id        String    @id @default(cuid())
-  sku       String    @unique
-  name      String
-  costPence Int       @default(0)
-  listings  Listing[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id          String    @id @default(cuid())
+  sku         String    @unique
+  name        String
+  costPence   Int       @default(0)
+  displayName String    @default("") // customer-facing name for the shop; falls back to `name`
+  slug        String?   @unique // web address of the product page
+  pricePence  Int       @default(0)
+  summary     String    @default("") // one sentence; also the meta description
+  description String[]  @default([]) // paragraphs
+  specs       Json      @default("[]") // [{ "label": "...", "value": "..." }]
+  inStock     Boolean   @default(true)
+  published   Boolean   @default(false)
+  image       String? // path under /public or an https address
+  listings    Listing[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([published])
 }
 
 // One product can have a listing per channel (Amazon ASIN, Shopify product, website page).

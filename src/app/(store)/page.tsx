@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PRODUCTS } from "@/lib/catalogue";
+import { productStore } from "@/lib/catalogue";
 import { formatPounds } from "@/lib/stats";
 import { productPath } from "@/lib/seo-meta";
 
@@ -10,15 +10,19 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-export default function StoreHome() {
+export const dynamic = "force-dynamic";
+
+export default async function StoreHome() {
+  const products = await productStore.listPublished();
   return (
     <>
       <h1 className="text-3xl font-semibold">Braided fabric cable for lamps and lighting</h1>
       <p className="mt-2 max-w-2xl text-muted">
         Three core textile flex for lamp rewires and pendant lights, dispatched from the UK.
       </p>
+      {products.length === 0 && <p className="mt-8 text-muted">Our products are coming soon.</p>}
       <ul className="mt-8 grid gap-4 sm:grid-cols-2">
-        {PRODUCTS.map((p) => (
+        {products.map((p) => (
           <li key={p.slug} className="rounded-lg border border-line bg-surface p-4">
             <h2 className="font-semibold">
               <Link href={productPath(p)} className="hover:underline focus-visible:outline-2 focus-visible:outline-accent">

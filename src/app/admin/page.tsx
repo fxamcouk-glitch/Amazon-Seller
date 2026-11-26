@@ -14,7 +14,7 @@ export default async function OverviewPage() {
 
   return (
     <>
-      <PageHeader title="Overview" description="Last 30 days across Amazon, Shopify and the website." />
+      <PageHeader title="Overview" description="Last 30 days across Amazon, Shopify and the website." sample />
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Kpi label="Total revenue" value={formatPounds(total)} />

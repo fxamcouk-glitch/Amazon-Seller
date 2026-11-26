@@ -1,18 +1,63 @@
-// SAMPLE CATALOGUE. Placeholder products until the real catalogue is loaded from the
-// database (Product and Listing in prisma/schema.prisma). Prices are in pence.
+import { getDb, hasDatabase } from "./db";
+import { PrismaProductStore } from "./prisma-product-store";
+
+export type Spec = { label: string; value: string };
+
+// A product as the shop shows it. Only published products with a web address ever have this shape.
 export type Product = {
   slug: string;
   sku: string;
-  name: string;
+  name: string; // customer-facing name
   pricePence: number;
   summary: string; // one sentence; source for meta description and listings
   description: string[]; // paragraphs
-  specs: { label: string; value: string }[];
+  specs: Spec[];
   inStock: boolean;
-  image?: string; // path under /public; structured-data rich results need one
+  image?: string; // path under /public or an https address; rich results need one
 };
 
-export const PRODUCTS: Product[] = [
+// A product as the dashboard edits it, including things the shop never shows.
+export type ProductRecord = {
+  sku: string;
+  name: string; // internal name, shared with the Amazon listing
+  displayName: string; // customer-facing name; the shop falls back to `name` when empty
+  slug: string | null;
+  pricePence: number;
+  costPence: number;
+  summary: string;
+  description: string[];
+  specs: Spec[];
+  inStock: boolean;
+  published: boolean;
+  image: string | null;
+};
+
+export class SlugTakenError extends Error {
+  constructor(public readonly slug: string) {
+    super("That web address is already used by another product.");
+  }
+}
+
+export class ReadOnlyCatalogueError extends Error {
+  constructor() {
+    super("Products are stored in the database. Set DATABASE_URL to edit them.");
+  }
+}
+
+export interface ProductStore {
+  readonly writable: boolean;
+  listPublished(): Promise<Product[]>;
+  getPublishedBySlug(slug: string): Promise<Product | undefined>;
+  // Any product with a price, published or not: used when recording a paid order.
+  getBySku(sku: string): Promise<Product | undefined>;
+  listAll(): Promise<ProductRecord[]>;
+  getRecord(sku: string): Promise<ProductRecord | undefined>;
+  save(record: ProductRecord): Promise<void>;
+}
+
+// SAMPLE CATALOGUE. Placeholder products that appear only when no database is configured (local
+// development). A real database starts empty and is never filled with these automatically.
+export const SAMPLE_PRODUCTS: Product[] = [
   {
     slug: "braided-fabric-cable-3-core-0-75mm-3m-black",
     sku: "FBC-3C-075-3M-BLK",
@@ -51,10 +96,44 @@ export const PRODUCTS: Product[] = [
   },
 ];
 
-export function getProduct(slug: string): Product | undefined {
-  return PRODUCTS.find((p) => p.slug === slug);
+
+const toRecord = (p: Product): ProductRecord => ({
+  sku: p.sku,
+  name: p.name,
+  displayName: p.name,
+  slug: p.slug,
+  pricePence: p.pricePence,
+  costPence: 0,
+  summary: p.summary,
+  description: p.description,
+  specs: p.specs,
+  inStock: p.inStock,
+  published: true,
+  image: p.image ?? null,
+});
+
+// Read-only store used when there is no database, so the shop still renders in development.
+export class SampleProductStore implements ProductStore {
+  readonly writable = false;
+  async listPublished() {
+    return SAMPLE_PRODUCTS;
+  }
+  async getPublishedBySlug(slug: string) {
+    return SAMPLE_PRODUCTS.find((p) => p.slug === slug);
+  }
+  async getBySku(sku: string) {
+    return SAMPLE_PRODUCTS.find((p) => p.sku === sku);
+  }
+  async listAll() {
+    return SAMPLE_PRODUCTS.map(toRecord);
+  }
+  async getRecord(sku: string) {
+    const p = SAMPLE_PRODUCTS.find((x) => x.sku === sku);
+    return p ? toRecord(p) : undefined;
+  }
+  async save(): Promise<void> {
+    throw new ReadOnlyCatalogueError();
+  }
 }
 
-export function getProductBySku(sku: string): Product | undefined {
-  return PRODUCTS.find((p) => p.sku === sku);
-}
+export const productStore: ProductStore = hasDatabase() ? new PrismaProductStore(getDb()) : new SampleProductStore();

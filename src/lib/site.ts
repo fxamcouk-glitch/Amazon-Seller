@@ -1,4 +1,4 @@
-export const SITE_NAME = "The Cable Store";
+export { SITE_NAME } from "./brand";
 
 // The public origin used for canonical links, the sitemap, structured data and Stripe
 // return URLs. Production must set SITE_URL: falling back to localhost would put

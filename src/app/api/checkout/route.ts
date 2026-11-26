@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
-import { getProduct } from "@/lib/catalogue";
+import { productStore } from "@/lib/catalogue";
 import { SITE_URL } from "@/lib/site";
 
 // Creates a Stripe Checkout session. The price always comes from our catalogue,
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   if (!key) return new NextResponse("Checkout is not configured yet.", { status: 503 });
 
   const form = await request.formData();
-  const product = getProduct(String(form.get("slug") ?? ""));
+  const product = await productStore.getPublishedBySlug(String(form.get("slug") ?? ""));
   const quantity = Number(form.get("quantity"));
   if (!product || !product.inStock || !Number.isInteger(quantity) || quantity < 1 || quantity > 20) {
     return new NextResponse("Invalid order.", { status: 400 });
