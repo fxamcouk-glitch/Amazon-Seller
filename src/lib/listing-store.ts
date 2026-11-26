@@ -1,6 +1,8 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { z } from "zod";
+import { getDb, hasDatabase } from "./db";
+import { PrismaListingStore } from "./prisma-listing-store";
 import { sampleListings } from "./sample-data";
 import type { Listing } from "./types";
 
@@ -68,6 +70,15 @@ export class FileListingStore implements ListingStore {
   }
 }
 
-export const listingStore: ListingStore = new FileListingStore(
-  process.env.LISTINGS_FILE ?? path.join(process.cwd(), "data", "listings.json"),
-);
+// With DATABASE_URL set, listings live in Postgres. Without it (local development) they fall back to
+// a JSON file. That file is not safe on a host with a temporary disk, so production should always
+// have DATABASE_URL set.
+function chooseStore(): ListingStore {
+  if (hasDatabase()) return new PrismaListingStore(getDb());
+  if (process.env.NODE_ENV === "production") {
+    console.warn("DATABASE_URL is not set: listings are stored in a local file that may be lost on redeploy.");
+  }
+  return new FileListingStore(process.env.LISTINGS_FILE ?? path.join(process.cwd(), "data", "listings.json"));
+}
+
+export const listingStore: ListingStore = chooseStore();

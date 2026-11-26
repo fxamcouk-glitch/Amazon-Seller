@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -10,6 +11,13 @@ enum Channel {
   AMAZON
   SHOPIFY
   WEBSITE
+}
+
+enum OrderStatus {
+  PAID
+  SHIPPED
+  CANCELLED
+  REFUNDED
 }
 
 model Product {
@@ -33,6 +41,7 @@ model Listing {
   bullets         String[]
   description     String   @default("")
   backendKeywords String   @default("") // Amazon search terms; unused on other channels
+  targetKeywords  String[] @default([])
   seoTitle        String? // Shopify/website SEO title
   metaDescription String?
   fnsku           String? // Amazon barcode id used on item labels
@@ -54,13 +63,73 @@ model TrackedLink {
 }
 
 model ChannelDailyStat {
-  id       String   @id @default(cuid())
-  date     DateTime @db.Date
-  channel  Channel
+  id           String   @id @default(cuid())
+  date         DateTime @db.Date
+  channel      Channel
   revenuePence Int
-  orders   Int
-  units    Int
-  sessions Int
+  orders       Int
+  units        Int
+  sessions     Int
 
   @@unique([date, channel])
+}
+
+// An order placed on our own website and paid through Stripe.
+model Order {
+  id              String      @id @default(cuid())
+  number          Int         @unique @default(autoincrement()) // human-friendly order number
+  stripeSessionId String      @unique
+  status          OrderStatus @default(PAID)
+  customerName    String
+  customerEmail   String
+  customerPhone   String?
+  shipLine1       String
+  shipLine2       String?
+  shipCity        String
+  shipRegion      String?
+  shipPostcode    String
+  shipCountry     String
+  subtotalPence   Int
+  shippingPence   Int         @default(0)
+  totalPence      Int
+  currency        String      @default("gbp")
+  paidAt          DateTime
+  createdAt       DateTime    @default(now())
+  items           OrderItem[]
+  invoice         Invoice?
+
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id             String @id @default(cuid())
+  orderId        String
+  order          Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  sku            String
+  name           String
+  unitPricePence Int
+  quantity       Int
+}
+
+// Invoice numbers come from InvoiceCounter inside the same transaction, so they are sequential
+// with no gaps, even if an order fails halfway.
+model Invoice {
+  id       String   @id @default(cuid())
+  orderId  String   @unique
+  order    Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  number   Int      @unique
+  issuedAt DateTime @default(now())
+  pdf      Bytes
+}
+
+model InvoiceCounter {
+  id   Int @id
+  last Int @default(0)
+}
+
+// Stripe retries webhooks; recording each event id once makes handling idempotent.
+model StripeEvent {
+  id         String   @id // Stripe's event id
+  type       String
+  receivedAt DateTime @default(now())
 }

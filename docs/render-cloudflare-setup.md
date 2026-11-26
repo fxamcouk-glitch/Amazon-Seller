@@ -23,7 +23,8 @@ control is about. Do not deploy into "My Workspace".
    only services on the private network can connect ([Render docs](https://render.com/docs/private-network)).
    Use the database's *internal* connection URL in the app.
 4. (Claude, after approval) Create a **web service** from this repository:
-   - Build command: `npm ci && npx prisma generate && npm run build`
+   - Build command: `npm ci && npm run build` (the build runs `prisma generate` itself)
+   - Pre-deploy command: `npx prisma migrate deploy` (applies the migrations in `prisma/migrations`)
    - Start command: `npm run start`
    - Environment variables (set in Render, never in the repo): `SITE_URL` (required at build time),
      `ADMIN_PASSWORD`, `DATABASE_URL` (internal URL), `STRIPE_SECRET_KEY`, `ANTHROPIC_API_KEY`,
@@ -44,10 +45,10 @@ control is about. Do not deploy into "My Workspace".
 5. Turn on two-step sign-in for the Cloudflare account.
 
 ## 3. Before this can carry real data
-The app still stores listings in a local file and the catalogue in code. Render's disk is not a
-safe store for real data, so **move listings, products and orders to the database first**
-(Prisma schema exists, nothing is migrated). Do not use the host for real customer or Amazon
-data until that is done.
+Listings now use Postgres whenever `DATABASE_URL` is set (without it the app falls back to a local
+file, which is only for development). The schema and first migration are in `prisma/`. The
+product catalogue is still in code (`src/lib/catalogue.ts`); move it to the database before the
+catalogue changes often. Make sure `DATABASE_URL` is set on Render before real data goes in.
 
 ## 4. Evidence to capture for Amazon (fill `docs/security-controls.md`)
 For each control, save a dated screenshot or settings export in a private folder, not the repo:
