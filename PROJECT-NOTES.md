@@ -198,3 +198,4 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
   - The IP54 wall light is merchant-fulfilled (12 units at home).
   - Ceramic A+ "Ceramic lighting range" (23607a5f-9a51-4097-98e3-dd633267f04d) built with `scripts/aplus-ceramics.ts` and linked to 4 ASINs. Submitted on the owner's instruction; approved and published 2026-11-24.
   - Support case drafted (Linen ZZ 5m/10m/50m part numbers, Oatmeal 5m brand); waiting for owner approval to send.
+- Receipts check (2026-11-26): automatic receipts are working. Orders placed after the VAT exemption declaration show an "Amazon generated" invoice PDF (for example 026-6822431-8065153 on 24 Nov and 204-2914089-4944308 on 26 Nov). 0 orders are flagged "No Invoice Uploaded" in the last 30 days, for both FBA and MFN. The June backlog receipt has cleared. The easybill subscription was already cancelled.
