@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, Link2, ListChecks, ScanBarcode } from "lucide-react";
+import { BarChart3, Link2, ListChecks, Receipt, ScanBarcode } from "lucide-react";
 
 const ITEMS = [
   { href: "/admin", label: "Overview", icon: BarChart3 },
   { href: "/admin/listings", label: "Listings & SEO", icon: ListChecks },
+  { href: "/admin/orders", label: "Orders", icon: Receipt },
   { href: "/admin/labels", label: "Labels", icon: ScanBarcode },
   { href: "/admin/links", label: "Tracked links", icon: Link2 },
 ];

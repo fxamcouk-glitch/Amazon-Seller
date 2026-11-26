@@ -27,8 +27,12 @@ control is about. Do not deploy into "My Workspace".
    - Pre-deploy command: `npx prisma migrate deploy` (applies the migrations in `prisma/migrations`)
    - Start command: `npm run start`
    - Environment variables (set in Render, never in the repo): `SITE_URL` (required at build time),
-     `ADMIN_PASSWORD`, `DATABASE_URL` (internal URL), `STRIPE_SECRET_KEY`, `ANTHROPIC_API_KEY`,
+     `ADMIN_PASSWORD`, `DATABASE_URL` (internal URL), `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
+     `BUSINESS_NAME`, `BUSINESS_ADDRESS`, `BUSINESS_EMAIL` (printed on invoices), `ANTHROPIC_API_KEY`,
      and the three Amazon credentials only once Amazon has approved access.
+   - Stripe webhook: in Stripe's webhook settings add an endpoint `https://<your domain>/api/stripe/webhook`
+     for `checkout.session.completed` and `checkout.session.async_payment_succeeded`, then copy its
+     signing secret into `STRIPE_WEBHOOK_SECRET`. Use Stripe test mode until everything is checked.
    - Turn off the default `onrender.com` address once the custom domain works, so the site is
      reachable only through Cloudflare (the service setting is called the Render subdomain policy).
 5. (owner) Restrict the web service's inbound traffic to Cloudflare's published address ranges

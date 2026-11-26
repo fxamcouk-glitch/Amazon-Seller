@@ -31,7 +31,9 @@ export async function POST(request: Request) {
     ],
     shipping_address_collection: { allowed_countries: ["GB"] },
     phone_number_collection: { enabled: true },
-    success_url: `${SITE_URL}/?order=success`,
+    // Our own record of what was bought: the webhook rebuilds the order from this, and never from the browser.
+    metadata: { sku: product.sku, quantity: String(quantity), unitPricePence: String(product.pricePence) },
+    success_url: `${SITE_URL}/order/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${SITE_URL}/products/${product.slug}`,
   });
 

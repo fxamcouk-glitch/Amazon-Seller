@@ -135,6 +135,15 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - Open: domain, workspace and costs approval, Amazon's answer on "equivalent" controls, move storage from file to database before real data.
 - Claude in Chrome was installed by the owner but connects only to a session started with it; this session never had it.
 
+## Back end built (2026-11-26)
+
+- **Database:** Prisma 7 + Postgres (`prisma/`, first migration committed). Listings use Postgres when `DATABASE_URL` is set, otherwise the dev file. Tests that need a database run only with `TEST_DATABASE_URL` (a disposable database).
+- **Orders:** Stripe webhook `/api/stripe/webhook` (signature-verified) records paid orders idempotently; the order is saved before the invoice is attempted; invoice numbers are gap-free (`InvoiceCounter`); PDF invoices never mention VAT. Confirmation page `/order/success`; admin `/admin/orders` with invoice download or "Create invoice".
+- **Labels:** `/admin/labels` prints 3 x 1.5 inch Code 128 FNSKU labels (verified by decoding the rendered PDF).
+- **Dependencies:** Next.js 16.4.6 (seven moderate advisories cleared; they were also failing the build). Remaining audit warnings are Prisma CLI tooling only.
+- Not yet done: emailing confirmations and invoices, Stripe live mode, moving the catalogue into the database, stock sync, MCF bridge (needs Amazon approval).
+- Owner must set `BUSINESS_NAME`, `BUSINESS_ADDRESS`, `BUSINESS_EMAIL` before invoices can be created.
+
 ## Handoff
 
 `docs/next-session-prompt.md` is a paste-in prompt for a new session started with Claude in Chrome (a session only gets Chrome when it starts). It lists current state, hard rules and the task order.

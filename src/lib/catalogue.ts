@@ -54,3 +54,7 @@ export const PRODUCTS: Product[] = [
 export function getProduct(slug: string): Product | undefined {
   return PRODUCTS.find((p) => p.slug === slug);
 }
+
+export function getProductBySku(sku: string): Product | undefined {
+  return PRODUCTS.find((p) => p.sku === sku);
+}
