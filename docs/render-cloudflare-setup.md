@@ -27,9 +27,17 @@ control is about. Do not deploy into "My Workspace".
    - Pre-deploy command: `npx prisma migrate deploy` (applies the migrations in `prisma/migrations`)
    - Start command: `npm run start`
    - Environment variables (set in Render, never in the repo): `SITE_URL` (required at build time),
-     `ADMIN_PASSWORD`, `DATABASE_URL` (internal URL), `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
+     `ADMIN_PASSWORD`, `ADMIN_TOTP_SECRET`, `SESSION_SECRET` (the last two come from the first-time
+     sign-in setup below), `DATABASE_URL` (internal URL), `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
      `BUSINESS_NAME`, `BUSINESS_ADDRESS`, `BUSINESS_EMAIL` (printed on invoices), `ANTHROPIC_API_KEY`,
      and the three Amazon credentials only once Amazon has approved access.
+   - First-time sign-in setup (owner): deploy with only `ADMIN_PASSWORD` set, open
+     `https://<your domain>/login/setup`, enter the password, scan the QR code with Google
+     Authenticator, then copy the two values shown (`ADMIN_TOTP_SECRET`, `SESSION_SECRET`) into Render's
+     environment settings and redeploy. Until then the dashboard stays closed. If the phone is lost,
+     delete `ADMIN_TOTP_SECRET` in Render and repeat this step.
+   - In Cloudflare add a rate-limiting rule for `/api/auth/login` (for example 10 requests a minute per
+     address) so nobody can use the app's own sign-in limit to lock the owner out.
    - Stripe webhook: in Stripe's webhook settings add an endpoint `https://<your domain>/api/stripe/webhook`
      for `checkout.session.completed` and `checkout.session.async_payment_succeeded`, then copy its
      signing secret into `STRIPE_WEBHOOK_SECRET`. Use Stripe test mode until everything is checked.

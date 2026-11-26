@@ -38,7 +38,14 @@ Stripe, email sending, and the owner's computer.
 
 ## 4. Access control
 - Only the owner has access to the application, database, hosting and Amazon developer accounts.
-- The dashboard is behind a password (`ADMIN_PASSWORD`) and refuses all access if none is set.
+- The dashboard needs two things to get in: the password (`ADMIN_PASSWORD`) and a 6-digit code from
+  Google Authenticator on the owner's phone (`ADMIN_TOTP_SECRET`). It refuses all access if either is
+  not set up. Codes work once only, sign-in cookies are signed, HttpOnly, Secure and SameSite=Strict,
+  and last 12 hours by default. After 5 wrong attempts from one address (40 from everywhere) sign-in is
+  paused for 15 minutes. If the phone is lost: remove `ADMIN_TOTP_SECRET` in the host's settings and
+  run `/login/setup` again with the password. To sign everyone out at once, change `SESSION_SECRET`.
+- Sign-in attempts are logged (what happened, when, and the visitor's IP address) so the Security page
+  can show them. These records are deleted after 90 days.
 - Use a long, unique password for every account, kept in a password manager. Turn on two-step
   sign-in wherever offered: Seller Central, Developer Central, Stripe, the host, the database provider.
 - Remove anyone's access within 24 hours if they leave or change role, and immediately if a

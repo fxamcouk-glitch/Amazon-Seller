@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { redirectTo } from "@/lib/auth/http";
 import { getDb, hasDatabase } from "@/lib/db";
 import { sendOrderConfirmation } from "@/lib/order-email";
 
@@ -13,9 +14,9 @@ export async function POST(request: Request, { params }: Context) {
   if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const result = await sendOrderConfirmation(db, order.id, { force: Boolean(order.confirmationSentAt) });
-  const back = new URL("/admin/orders", request.url);
-  if (result.status === "sent") back.searchParams.set("notice", `Confirmation email sent for order ${n}.`);
-  else if (result.status === "skipped") back.searchParams.set("error", result.reason);
-  else if (result.status === "failed") back.searchParams.set("error", result.error);
-  return NextResponse.redirect(back, 303);
+  const back = new URLSearchParams();
+  if (result.status === "sent") back.set("notice", `Confirmation email sent for order ${n}.`);
+  else if (result.status === "skipped") back.set("error", result.reason);
+  else if (result.status === "failed") back.set("error", result.error);
+  return redirectTo(`/admin/orders${back.size ? `?${back}` : ""}`);
 }

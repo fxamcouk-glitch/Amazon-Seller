@@ -37,7 +37,7 @@ hands orders to Amazon for dispatch (Amazon Multi-Channel Fulfilment, "MCF").
 - Public store: home page, product pages with canonical and Open Graph tags, Product and
   Breadcrumb JSON-LD, `sitemap.xml`, `robots.txt`, Stripe Checkout route (`/api/checkout`).
   Catalogue is sample data in `src/lib/catalogue.ts`.
-- Dashboard at `/admin` behind HTTP Basic auth (`ADMIN_PASSWORD`, fails closed in production):
+- Dashboard at `/admin` behind password + Google Authenticator sign-in (`ADMIN_PASSWORD`, `ADMIN_TOTP_SECRET`, `SESSION_SECRET`; fails closed in production):
   Overview (sample data), Listings & SEO editor with a Claude rewrite assistant (stored in
   `data/listings.json`, gitignored), Tracked links.
 - Prisma schema exists (`prisma/schema.prisma`) but nothing is migrated yet.

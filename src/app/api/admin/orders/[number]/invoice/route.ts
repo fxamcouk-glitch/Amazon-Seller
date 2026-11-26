@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { redirectTo } from "@/lib/auth/http";
 import { getDb, hasDatabase } from "@/lib/db";
 import { MissingBusinessDetails, ensureInvoice, getInvoicePdf } from "@/lib/orders";
 
@@ -32,7 +33,7 @@ export async function POST(request: Request, { params }: Context) {
     await ensureInvoice(db, order.stripeSessionId);
   } catch (error) {
     const message = error instanceof MissingBusinessDetails ? error.message : "Could not create the invoice";
-    return NextResponse.redirect(new URL(`/admin/orders?error=${encodeURIComponent(message)}`, request.url), 303);
+    return redirectTo(`/admin/orders?error=${encodeURIComponent(message)}`);
   }
-  return NextResponse.redirect(new URL("/admin/orders", request.url), 303);
+  return redirectTo("/admin/orders");
 }

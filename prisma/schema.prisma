@@ -161,3 +161,27 @@ model ProductImage {
   side      Int // pixel size of the large version's square canvas
   createdAt DateTime @default(now())
 }
+
+// Login protection. AuthThrottle counts attempts per client in a fixed window; the count is raised in a
+// single atomic statement so many simultaneous guesses cannot slip past the limit. AuthState holds the
+// newest authenticator code step that was accepted, so a code cannot be used twice. AuthEvent is a
+// short log of sign-ins for the owner to review.
+model AuthThrottle {
+  key         String   @id
+  count       Int
+  windowStart DateTime
+}
+
+model AuthState {
+  key      String @id
+  intValue Int    @default(0)
+}
+
+model AuthEvent {
+  id   String   @id @default(cuid())
+  at   DateTime @default(now())
+  kind String // login_success, login_failure, login_blocked, logout, setup_view
+  ip   String?
+
+  @@index([at])
+}

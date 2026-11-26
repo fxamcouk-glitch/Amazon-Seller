@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, Link2, ListChecks, Package, Receipt, ScanBarcode } from "lucide-react";
+import { BarChart3, Link2, ListChecks, Package, Receipt, ScanBarcode, ShieldCheck } from "lucide-react";
 
 const ITEMS = [
   { href: "/admin", label: "Overview", icon: BarChart3 },
@@ -11,6 +11,7 @@ const ITEMS = [
   { href: "/admin/orders", label: "Orders", icon: Receipt },
   { href: "/admin/labels", label: "Labels", icon: ScanBarcode },
   { href: "/admin/links", label: "Tracked links", icon: Link2 },
+  { href: "/admin/security", label: "Security", icon: ShieldCheck },
 ];
 
 export function SideNav() {
@@ -40,6 +41,11 @@ export function SideNav() {
           );
         })}
       </ul>
+      <form method="post" action="/api/auth/logout" className="px-2 pb-3 pt-2 md:pt-4">
+        <button type="submit" className="w-full rounded-md px-3 py-2 text-left text-sm text-muted hover:bg-page hover:text-ink focus-visible:outline-2 focus-visible:outline-accent">
+          Sign out
+        </button>
+      </form>
     </nav>
   );
 }

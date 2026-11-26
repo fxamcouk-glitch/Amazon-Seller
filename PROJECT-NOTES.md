@@ -86,7 +86,7 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 ## Decisions (owner delegated hosting and platform; 2026-10-24)
 
 - **Website:** custom Next.js storefront in this repo, **Stripe Checkout** for payments (hosted by Stripe, so cards, wallets and receipts need no payment code of ours). Rationale: full control of SEO (server-rendered pages, canonical tags, sitemap, Product/Breadcrumb structured data) and a direct Stripe-webhook -> Amazon MCF path with no store platform in between. Trade-off: we build and maintain cart, shipping and VAT handling; Shopify would launch faster. Reversible: the channel/connector layer still supports Shopify.
-- **Dashboard** lives at `/admin`, behind HTTP Basic auth (`ADMIN_PASSWORD`); it fails closed in production when unset. `/admin` and `/api` are disallowed in `robots.txt`.
+- **Dashboard** lives at `/admin`, behind password + Google Authenticator (TOTP) sign-in (`ADMIN_PASSWORD`, `ADMIN_TOTP_SECRET`, `SESSION_SECRET`, optional `SESSION_HOURS`); it fails closed in production when any is unset. First-time setup is at `/login/setup`; sign-in events are listed on `/admin/security`. `/admin` and `/api` are disallowed in `robots.txt`.
 - **Hosting:** not yet chosen or deployed. Render is the likely first choice (a Render connector is available in the build environment) with Neon Postgres. Verify current pricing and free-tier limits before committing; some hosts' free plans exclude commercial use.
 - **Brand Registry:** owner believes the brand was registered. Verify in Seller Central that it is still active after reactivation; Amazon Attribution depends on it.
 
