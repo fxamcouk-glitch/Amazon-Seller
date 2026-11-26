@@ -20,6 +20,20 @@ describe("parseListingInput", () => {
   });
 });
 
+describe("fnsku handling", () => {
+  it("tidies case and spaces, and treats blank as none", () => {
+    expect(parseListingInput({ ...base, fnsku: " b0cw lr1fny " }, base.sku)).toMatchObject({ ok: true, listing: { fnsku: "B0CWLR1FNY" } });
+    const blank = parseListingInput({ ...base, fnsku: "  " }, base.sku);
+    expect(blank.ok && "fnsku" in blank.listing).toBe(false);
+  });
+
+  it("rejects a malformed FNSKU with a clear message", () => {
+    const r = parseListingInput({ ...base, fnsku: "SHORT" }, base.sku);
+    expect(r).toMatchObject({ ok: false });
+    expect(!r.ok && r.error).toContain("FNSKU");
+  });
+});
+
 describe("parseNewListing", () => {
   it("creates an empty Amazon listing from a sku and name", () => {
     expect(parseNewListing({ sku: " ABC-1 ", name: " Cable " })).toMatchObject({

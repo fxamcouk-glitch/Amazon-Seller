@@ -34,4 +34,5 @@ export type Listing = {
   description: string;
   backendKeywords: string;
   targetKeywords: string[]; // search phrases to rank for, most important first
+  fnsku?: string; // Amazon's barcode id for this SKU, printed on item labels
 };

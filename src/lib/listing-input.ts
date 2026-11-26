@@ -4,9 +4,23 @@ import type { Listing } from "./types";
 // Parses an editor submission and tidies it: trims text and drops blank bullets
 // and keywords. The sku in the URL is authoritative, and only Amazon listings
 // are edited here.
+// A blank FNSKU means "none"; otherwise tidy case and spacing so "b0cw lr1fny " still validates.
+function normaliseFnsku(body: unknown): unknown {
+  if (typeof body !== "object" || body === null || !("fnsku" in body)) return body;
+  const raw = (body as { fnsku?: unknown }).fnsku;
+  if (typeof raw !== "string") return body;
+  const tidy = raw.replace(/\s+/g, "").toUpperCase();
+  const { fnsku: _drop, ...rest } = body as Record<string, unknown>;
+  void _drop;
+  return tidy ? { ...rest, fnsku: tidy } : rest;
+}
+
 export function parseListingInput(body: unknown, sku: string): { ok: true; listing: Listing } | { ok: false; error: string } {
-  const parsed = ListingSchema.safeParse(body);
-  if (!parsed.success) return { ok: false, error: "The listing is not in the expected format." };
+  const parsed = ListingSchema.safeParse(normaliseFnsku(body));
+  if (!parsed.success) {
+    const fnskuIssue = parsed.error.issues.find((i) => i.path[0] === "fnsku");
+    return { ok: false, error: fnskuIssue ? "FNSKU must be 10 capital letters and numbers, for example X001ABCDE9." : "The listing is not in the expected format." };
+  }
   const l = parsed.data;
   if (l.sku !== sku) return { ok: false, error: "SKU does not match the address." };
   if (l.channel !== "amazon") return { ok: false, error: "Only Amazon listings can be edited here." };

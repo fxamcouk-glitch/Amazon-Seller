@@ -30,6 +30,7 @@ export function ListingEditor({ initial }: { initial: Listing }) {
   const [description, setDescription] = useState(initial.description);
   const [backendKeywords, setBackendKeywords] = useState(initial.backendKeywords);
   const [keywords, setKeywords] = useState(initial.targetKeywords.join("\n"));
+  const [fnsku, setFnsku] = useState(initial.fnsku ?? "");
   const [status, setStatus] = useState<Status>(null);
   const [saving, setSaving] = useState(false);
   const [asking, setAsking] = useState(false);
@@ -42,6 +43,7 @@ export function ListingEditor({ initial }: { initial: Listing }) {
     description,
     backendKeywords,
     targetKeywords: keywords.split("\n").map((k) => k.trim()).filter(Boolean),
+    fnsku: fnsku.replace(/\s+/g, "").toUpperCase() || undefined,
   };
   const { score, issues, keywordCoverage } = checkAmazonListing(draft);
   const L = AMAZON_LIMITS;
@@ -106,6 +108,15 @@ export function ListingEditor({ initial }: { initial: Listing }) {
       <div className="grid gap-4">
         <Card>
           <form className="grid gap-4" onSubmit={(e) => { e.preventDefault(); save(); }}>
+            <label className="grid gap-1 text-sm font-medium">
+              FNSKU (Amazon barcode, for printing labels)
+              <input
+                value={fnsku}
+                onChange={(e) => setFnsku(e.target.value)}
+                placeholder="X001ABCDE9"
+                className={INPUT}
+              />
+            </label>
             <label className="grid gap-1 text-sm font-medium">
               Target keywords (one per line, most important first)
               <textarea rows={4} value={keywords} onChange={(e) => setKeywords(e.target.value)} className={INPUT} />

@@ -13,6 +13,7 @@ export const ListingSchema = z.object({
   description: z.string(),
   backendKeywords: z.string(),
   targetKeywords: z.array(z.string()).max(50),
+  fnsku: z.string().regex(/^[A-Z0-9]{10}$/, "FNSKU must be 10 capital letters and numbers").optional(),
 });
 
 export interface ListingStore {

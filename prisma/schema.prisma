@@ -35,6 +35,7 @@ model Listing {
   backendKeywords String   @default("") // Amazon search terms; unused on other channels
   seoTitle        String? // Shopify/website SEO title
   metaDescription String?
+  fnsku           String? // Amazon barcode id used on item labels
   updatedAt       DateTime @updatedAt
 
   @@unique([productId, channel])
