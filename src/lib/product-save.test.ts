@@ -4,7 +4,7 @@ import { saveProductRequest } from "./product-save";
 
 const record = (over: Partial<ProductRecord> = {}): ProductRecord => ({
   sku: "A-1", name: "A", displayName: "", slug: "a-one", pricePence: 500, costPence: 0, summary: "Summary",
-  description: [], specs: [], inStock: true, published: true, image: null, ...over,
+  description: [], specs: [], inStock: true, published: true, image: null, imageAlt: "", ...over,
 });
 
 function fakeStore(initial: ProductRecord[] = [], opts: { writable?: boolean; takenSlug?: string } = {}) {

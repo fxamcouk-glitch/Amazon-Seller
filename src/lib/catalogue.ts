@@ -13,7 +13,8 @@ export type Product = {
   description: string[]; // paragraphs
   specs: Spec[];
   inStock: boolean;
-  image?: string; // path under /public or an https address; rich results need one
+  image?: string; // /media/<id>.webp for an uploaded photo, or an https address; rich results need one
+  imageAlt?: string; // describes the image for people who cannot see it, and for search
 };
 
 // A product as the dashboard edits it, including things the shop never shows.
@@ -30,6 +31,7 @@ export type ProductRecord = {
   inStock: boolean;
   published: boolean;
   image: string | null;
+  imageAlt: string;
 };
 
 export class SlugTakenError extends Error {
@@ -110,6 +112,7 @@ const toRecord = (p: Product): ProductRecord => ({
   inStock: p.inStock,
   published: true,
   image: p.image ?? null,
+  imageAlt: p.imageAlt ?? "",
 });
 
 // Read-only store used when there is no database, so the shop still renders in development.

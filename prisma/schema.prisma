@@ -35,7 +35,8 @@ model Product {
   specs       Json      @default("[]") // [{ "label": "...", "value": "..." }]
   inStock     Boolean   @default(true)
   published   Boolean   @default(false)
-  image       String? // path under /public or an https address
+  image       String? // /media/<id>.webp for an uploaded image, or an https address
+  imageAlt    String    @default("") // description of the image, for accessibility and search
   listings    Listing[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -145,4 +146,14 @@ model StripeEvent {
   id         String   @id // Stripe's event id
   type       String
   receivedAt DateTime @default(now())
+}
+
+// Uploaded product photos, stored in the database so the host needs no file storage. Each upload is
+// re-encoded as a square WebP (a large and a thumbnail version); the original file is never kept.
+model ProductImage {
+  id        String   @id @default(cuid())
+  large     Bytes
+  thumb     Bytes
+  side      Int // pixel size of the large version's square canvas
+  createdAt DateTime @default(now())
 }

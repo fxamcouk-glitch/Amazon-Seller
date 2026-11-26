@@ -16,6 +16,7 @@ const good: ProductRecord = {
   inStock: true,
   published: true,
   image: "/images/red-10m.jpg",
+  imageAlt: "Red braided fabric cable on a white background",
 };
 
 const parse = (over: Partial<Record<keyof ProductRecord, unknown>> = {}, urlSku?: string) =>
@@ -56,6 +57,12 @@ describe("parseProductInput", () => {
     }
   });
 
+  it("accepts an uploaded photo's address and limits the image description", () => {
+    expect(parse({ image: "/media/ckabc123def456.webp" }).ok).toBe(true);
+    expect(parse({ imageAlt: "x".repeat(201) }).ok).toBe(false);
+    expect(parse({ imageAlt: "  A red cable  " })).toMatchObject({ ok: true, record: { imageAlt: "A red cable" } });
+  });
+
   it("rejects bad SKUs, fractional or negative prices, and a SKU that differs from the address", () => {
     expect(parse({ sku: "a/b" }).ok).toBe(false);
     expect(parse({ pricePence: 12.5 }).ok).toBe(false);
@@ -80,6 +87,7 @@ describe("seoWarnings", () => {
     expect(w).toContain("shop name is");
     expect(w).toContain("summary is short");
     expect(w).toContain("No image");
+    expect(seoWarnings({ ...good, imageAlt: "" }).join(" ")).toContain("Describe the image");
     expect(seoWarnings({ ...good, summary: "x".repeat(170) }).join(" ")).toContain("cut near 160");
   });
 });

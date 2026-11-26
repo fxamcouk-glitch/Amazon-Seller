@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Card } from "@/components/card";
 import type { ProductRecord } from "@/lib/catalogue";
 import { penceToPounds, paragraphsToText, poundsToPence, slugify, specsToText, textToParagraphs, textToSpecs } from "@/lib/product-form-utils";
+import { thumbUrl } from "@/lib/images/store";
 import { seoWarnings } from "@/lib/product-input";
 import { fullTitle } from "@/lib/seo-text";
 
@@ -26,13 +27,38 @@ export function ProductForm({ initial }: { initial?: ProductRecord }) {
   const [description, setDescription] = useState(paragraphsToText(initial?.description ?? []));
   const [specs, setSpecs] = useState(specsToText(initial?.specs ?? []));
   const [image, setImage] = useState(initial?.image ?? "");
+  const [imageAlt, setImageAlt] = useState(initial?.imageAlt ?? "");
+  const [uploading, setUploading] = useState(false);
+  const [uploadNote, setUploadNote] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
   const [inStock, setInStock] = useState(initial?.inStock ?? true);
   const [published, setPublished] = useState(initial?.published ?? false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const shown = displayName.trim() || name.trim();
-  const warnings = seoWarnings({ name: name.trim(), displayName: displayName.trim(), summary: summary.trim(), image: image.trim() || null });
+  const warnings = seoWarnings({ name: name.trim(), displayName: displayName.trim(), summary: summary.trim(), image: image.trim() || null, imageAlt: imageAlt.trim() });
+
+  async function upload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // lets the same file be chosen again after an error
+    if (!file) return;
+    setUploading(true);
+    setUploadNote(null);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/admin/images", { method: "POST", body });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setImage(data.url);
+        setUploadNote({ kind: "ok", text: data.warning ?? "Photo uploaded. Save the product to keep it." });
+      } else setUploadNote({ kind: "error", text: data.error ?? "Could not upload that photo." });
+    } catch {
+      setUploadNote({ kind: "error", text: "Could not reach the server." });
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -61,6 +87,7 @@ export function ProductForm({ initial }: { initial?: ProductRecord }) {
           inStock,
           published,
           image: image.trim(),
+          imageAlt: imageAlt.trim(),
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -106,7 +133,7 @@ export function ProductForm({ initial }: { initial?: ProductRecord }) {
               <input inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="12.99" className={INPUT} />
             </label>
             <label className="grid min-w-0 gap-1 text-sm font-medium">
-              Your cost (£, for margin; never shown)
+              Your cost (£, never shown)
               <input inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} placeholder="6.50" className={INPUT} />
             </label>
           </div>
@@ -122,10 +149,36 @@ export function ProductForm({ initial }: { initial?: ProductRecord }) {
             Specification (one &quot;Label: value&quot; per line)
             <textarea rows={5} value={specs} onChange={(e) => setSpecs(e.target.value)} placeholder={"Cores: 3\nLength: 3 metres"} className={INPUT} />
           </label>
-          <label className="grid gap-1 text-sm font-medium">
-            Image (a path such as /images/cable.jpg, or an https:// address)
-            <input value={image} onChange={(e) => setImage(e.target.value)} className={INPUT} />
-          </label>
+          <fieldset className="grid gap-3 rounded-md border border-line p-3">
+            <legend className="px-1 text-sm font-medium">Photo</legend>
+            {image && (
+              <div className="flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={thumbUrl(image)} alt="" width={96} height={96} className="size-24 rounded-md border border-line bg-white object-contain" />
+                <button type="button" onClick={() => { setImage(""); setImageAlt(""); setUploadNote(null); }} className={`${BUTTON} border border-line`}>
+                  Remove photo
+                </button>
+              </div>
+            )}
+            <label className="grid gap-1 text-sm font-medium">
+              Upload a photo (JPG, PNG or WebP, up to 8 MB; shown square on a white background)
+              <input type="file" accept="image/jpeg,image/png,image/webp" onChange={upload} disabled={uploading} className="text-sm font-normal" />
+            </label>
+            {uploading && <p role="status" className="text-sm text-muted">Uploading…</p>}
+            {uploadNote && (
+              <p role={uploadNote.kind === "error" ? "alert" : "status"} className={`text-sm ${uploadNote.kind === "error" ? "text-bad" : "text-good"}`}>
+                {uploadNote.text}
+              </p>
+            )}
+            <label className="grid gap-1 text-sm font-medium">
+              Photo description (for screen readers and image search)
+              <input value={imageAlt} onChange={(e) => setImageAlt(e.target.value)} placeholder="Red braided fabric cable on a white background" className={INPUT} />
+            </label>
+            <label className="grid gap-1 text-sm font-medium">
+              Or use an image address (https://)
+              <input value={image} onChange={(e) => setImage(e.target.value)} className={INPUT} />
+            </label>
+          </fieldset>
           <label className="flex items-center gap-2 text-sm font-medium">
             <input type="checkbox" checked={inStock} onChange={(e) => setInStock(e.target.checked)} />
             In stock

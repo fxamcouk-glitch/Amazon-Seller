@@ -11,7 +11,7 @@ const db = url ? createDb(url) : undefined;
 const rec = (over: Partial<ProductRecord> = {}): ProductRecord => ({
   sku: "P-1", name: "Internal name", displayName: "Shop name", slug: "shop-name", pricePence: 1299, costPence: 600,
   summary: "A summary.", description: ["Para one", "Para two"], specs: [{ label: "Cores", value: "3" }],
-  inStock: true, published: true, image: "/images/a.jpg", ...over,
+  inStock: true, published: true, image: "/images/a.jpg", imageAlt: "A cable", ...over,
 });
 
 describe.skipIf(!db)("PrismaProductStore", () => {

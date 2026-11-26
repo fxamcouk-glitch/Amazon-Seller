@@ -44,7 +44,7 @@ control is about. Do not deploy into "My Workspace".
 1. Add your domain to Cloudflare and change its nameservers as Cloudflare instructs. Needs a domain you own.
 2. Point the domain at the Render service, proxied (orange cloud).
 3. SSL/TLS mode: full (strict).
-4. Turn on the WAF managed ruleset (the free one is on by default on the Free plan per
+4. Product photos are served from `/media/...` with a one-year cache header, so Cloudflare can cache them; do not add a rule that blocks `/media`. Turn on the WAF managed ruleset (the free one is on by default on the Free plan per
    [Cloudflare's docs](https://developers.cloudflare.com/waf/managed-rules/)). Confirm in the dashboard.
 5. Turn on two-step sign-in for the Cloudflare account.
 

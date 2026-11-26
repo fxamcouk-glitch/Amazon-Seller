@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { productStore } from "@/lib/catalogue";
 import { formatPounds } from "@/lib/stats";
+import { thumbUrl } from "@/lib/images/store";
 import { productPath } from "@/lib/seo-meta";
 
 export const metadata: Metadata = {
@@ -24,6 +25,17 @@ export default async function StoreHome() {
       <ul className="mt-8 grid gap-4 sm:grid-cols-2">
         {products.map((p) => (
           <li key={p.slug} className="rounded-lg border border-line bg-surface p-4">
+            {p.image && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={thumbUrl(p.image)}
+                alt={p.imageAlt || p.name}
+                width={400}
+                height={400}
+                loading="lazy"
+                className="mb-3 aspect-square w-full rounded-md border border-line bg-white object-contain"
+              />
+            )}
             <h2 className="font-semibold">
               <Link href={productPath(p)} className="hover:underline focus-visible:outline-2 focus-visible:outline-accent">
                 {p.name}

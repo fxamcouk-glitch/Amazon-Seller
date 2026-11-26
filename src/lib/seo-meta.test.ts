@@ -29,6 +29,13 @@ describe("productJsonLd", () => {
     expect(d.shippingDestination.addressCountry).toBe("GB");
   });
 
+  it("gives structured data full image addresses for both uploaded paths and external images", () => {
+    const own = productJsonLd({ ...PRODUCTS[0], image: "/media/ckabc123def456.webp" }) as { image: string[] };
+    expect(own.image[0]).toMatch(/^https?:\/\/[^/]+\/media\/ckabc123def456\.webp$/);
+    const external = productJsonLd({ ...PRODUCTS[0], image: "https://cdn.example.com/a.jpg" }) as { image: string[] };
+    expect(external.image).toEqual(["https://cdn.example.com/a.jpg"]);
+  });
+
   it("omits image when the product has none", () => {
     expect("image" in productJsonLd(PRODUCTS[0])).toBe(false);
   });

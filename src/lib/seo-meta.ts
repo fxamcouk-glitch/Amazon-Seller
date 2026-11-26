@@ -3,6 +3,9 @@ import type { Product } from "./catalogue";
 
 export { DESCRIPTION_MAX, TITLE_MAX, TITLE_SUFFIX, fullTitle, truncate } from "./seo-text";
 
+// Structured data needs full addresses: paths on this site get the site address, https addresses stay as they are.
+export const absoluteUrl = (pathOrUrl: string): string => (/^https?:\/\//.test(pathOrUrl) ? pathOrUrl : `${SITE_URL}${pathOrUrl}`);
+
 export function productPath(product: Product): string {
   return `/products/${product.slug}`;
 }
@@ -15,7 +18,7 @@ export function productJsonLd(product: Product) {
     sku: product.sku,
     description: product.summary,
     brand: { "@type": "Brand", name: SITE_NAME },
-    ...(product.image ? { image: [`${SITE_URL}${product.image}`] } : {}),
+    ...(product.image ? { image: [absoluteUrl(product.image)] } : {}),
     offers: {
       "@type": "Offer",
       url: `${SITE_URL}${productPath(product)}`,

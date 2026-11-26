@@ -17,7 +17,7 @@ async function main() {
   for (const p of SAMPLE_PRODUCTS) {
     const record: ProductRecord = {
       sku: p.sku, name: p.name, displayName: p.name, slug: p.slug, pricePence: p.pricePence, costPence: 0,
-      summary: p.summary, description: p.description, specs: p.specs, inStock: p.inStock, published: true, image: p.image ?? null,
+      summary: p.summary, description: p.description, specs: p.specs, inStock: p.inStock, published: true, image: p.image ?? null, imageAlt: "",
     };
     await store.save(record);
     console.log(`Saved ${p.sku}`);

@@ -70,7 +70,7 @@ describe.skipIf(!db)("orders and invoices (Postgres)", () => {
     await db!.product.deleteMany();
     await products.save({
       sku: product.sku, name: product.name, displayName: product.name, slug: product.slug, pricePence: product.pricePence,
-      costPence: 0, summary: product.summary, description: product.description, specs: product.specs, inStock: true, published: true, image: null,
+      costPence: 0, summary: product.summary, description: product.description, specs: product.specs, inStock: true, published: true, image: null, imageAlt: "",
     });
   });
   afterAll(async () => db?.$disconnect());

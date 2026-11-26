@@ -22,7 +22,8 @@ export const ProductInputSchema = z
     specs: z.array(z.object({ label: z.string().trim().min(1).max(60), value: z.string().trim().min(1).max(200) })).max(30),
     inStock: z.boolean(),
     published: z.boolean(),
-    image: z.preprocess(blankToNull, z.string().trim().max(500).regex(IMAGE_PATTERN, "Use a path such as /images/cable.jpg or an https:// address.").nullable()),
+    imageAlt: z.string().trim().max(200),
+    image: z.preprocess(blankToNull, z.string().trim().max(500).regex(IMAGE_PATTERN, "Upload a photo, or use an https:// address.").nullable()),
   })
   .superRefine((p, ctx) => {
     if (!p.published) return;
@@ -46,12 +47,13 @@ export function parseProductInput(body: unknown, urlSku?: string): ParsedProduct
 }
 
 // Plain-language warnings shown beside the form. They never block saving.
-export function seoWarnings(p: Pick<ProductRecord, "name" | "displayName" | "summary" | "image">): string[] {
+export function seoWarnings(p: Pick<ProductRecord, "name" | "displayName" | "summary" | "image"> & { imageAlt?: string }): string[] {
   const out: string[] = [];
   const shown = p.displayName || p.name;
   if (shown.length > TITLE_MAX) out.push(`The shop name is ${shown.length} characters; search results cut titles near ${TITLE_MAX}. Shorten it.`);
   if (p.summary.length > 160) out.push(`The summary is ${p.summary.length} characters; the search result description is cut near 160.`);
   if (p.summary.length > 0 && p.summary.length < 70) out.push("The summary is short; around 120 to 160 characters describes the product better in search results.");
   if (!p.image) out.push("No image: product pages without an image are unlikely to get rich results in Google.");
+  else if (!p.imageAlt) out.push("Describe the image (for example \"Red braided cable on a white background\"). It helps people using screen readers and image search.");
   return out;
 }

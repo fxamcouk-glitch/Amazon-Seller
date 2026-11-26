@@ -17,6 +17,7 @@ type Row = {
   inStock: boolean;
   published: boolean;
   image: string | null;
+  imageAlt: string;
 };
 
 function toRecord(row: Row): ProductRecord {
@@ -34,6 +35,7 @@ function toRecord(row: Row): ProductRecord {
     inStock: row.inStock,
     published: row.published,
     image: row.image,
+    imageAlt: row.imageAlt,
   };
 }
 
@@ -51,6 +53,7 @@ function toStorefront(row: Row, requirePublished: boolean): Product | undefined 
     specs: r.specs,
     inStock: r.inStock,
     ...(r.image ? { image: r.image } : {}),
+    ...(r.image && r.imageAlt ? { imageAlt: r.imageAlt } : {}),
   };
 }
 
@@ -95,6 +98,7 @@ export class PrismaProductStore implements ProductStore {
       inStock: record.inStock,
       published: record.published,
       image: record.image,
+      imageAlt: record.imageAlt,
     };
     try {
       await this.db.product.upsert({ where: { sku: record.sku }, create: { sku: record.sku, ...data }, update: data });
