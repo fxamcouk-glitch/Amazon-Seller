@@ -33,7 +33,7 @@ Stripe, email sending, and the owner's computer.
 | Amazon listings and stock data | Amazon SP-API | Listing improvement, stock accuracy | [database provider, region] | Owner only | Kept while the listing exists; deleted within [30] days of a listing being removed | Anthropic (listing text only), host and database providers |
 | Amazon fulfilment status, tracking | Amazon SP-API | Show order status, tell the customer | [database provider] | Owner only | [period; align with order records] | Email provider (tracking number to the customer) |
 | Amazon fees and settlements | Amazon SP-API | Margin reporting | [database provider] | Owner only | [period; accountant to confirm] | None |
-| Website customer details and orders | Our checkout and Stripe | Take payment, dispatch, invoices, support | [database provider] | Owner only | [period; accountant to confirm for tax records] | Stripe, Amazon (delivery address only, to ship the order), email provider |
+| Website customer details and orders | Our checkout and Stripe | Take payment, dispatch, invoices, confirmation emails, support | [database provider] | Owner only | [period; accountant to confirm for tax records] | Stripe, Amazon (delivery address only, to ship the order), Resend (confirmation emails) |
 | Credentials | Amazon, Stripe, hosts | Run the application | Host's secret store, never in code | Owner only | Rotated every [12] months and on any suspected exposure | None |
 
 ## 4. Access control
@@ -53,7 +53,7 @@ Stripe, email sending, and the owner's computer.
 | [Database provider] | All stored data | Store it |
 | Stripe | Own-customer name, email, address and payment details | Take payment. Card details are handled by Stripe, not stored by us |
 | Amazon (fulfilment) | Own-customer delivery name and address for an order | Ship the order |
-| [Email provider] | Customer email address and order details | Send confirmations and invoices |
+| Resend (email) | The customer's name, email address, delivery address, order details and the invoice PDF, in each confirmation email | Send order confirmations and invoices. Resend keeps a log of emails it sends; check its retention and privacy terms and record them here: [retention period] |
 Before adding a provider, record what it receives and check its security and privacy terms.
 
 ## 6. Retention and disposal

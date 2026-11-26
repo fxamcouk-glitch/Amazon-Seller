@@ -33,7 +33,7 @@ export function toInvoiceOrder(order: NonNullable<OrderWithItems>): InvoiceOrder
 
 export type RecordResult =
   | { status: "ignored"; reason: string }
-  | { status: "recorded" | "exists"; orderNumber: number; invoiceError?: string };
+  | { status: "recorded" | "exists"; orderNumber: number; orderId: string; invoiceError?: string };
 
 // Turns a paid Stripe Checkout session into an order. Safe to run any number of times for the same
 // session: Stripe retries webhooks, and the second run finds the order already there.
@@ -55,6 +55,7 @@ export async function recordPaidOrder(
 
   const existing = await findOrderBySession(db, session.id);
   let orderNumber = existing?.number;
+  let orderId = existing?.id;
   let status: "recorded" | "exists" = "exists";
 
   if (!existing) {
@@ -84,21 +85,24 @@ export async function recordPaidOrder(
         },
       });
       orderNumber = created.number;
+      orderId = created.id;
       status = "recorded";
     } catch (error) {
       // A concurrent delivery of the same webhook created it first.
       if ((error as { code?: string }).code !== "P2002") throw error;
-      orderNumber = (await findOrderBySession(db, session.id))!.number;
+      const raced = (await findOrderBySession(db, session.id))!;
+      orderNumber = raced.number;
+      orderId = raced.id;
     }
   }
 
   // The order is saved before the invoice is attempted, so a failure here never loses a sale.
   try {
     await ensureInvoice(db, session.id, env);
-    return { status, orderNumber: orderNumber! };
+    return { status, orderNumber: orderNumber!, orderId: orderId! };
   } catch (error) {
     console.error(`Order ${orderNumber} recorded but its invoice failed:`, error);
-    return { status, orderNumber: orderNumber!, invoiceError: error instanceof Error ? error.message : "invoice failed" };
+    return { status, orderNumber: orderNumber!, orderId: orderId!, invoiceError: error instanceof Error ? error.message : "invoice failed" };
   }
 }
 

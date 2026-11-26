@@ -48,6 +48,19 @@ control is about. Do not deploy into "My Workspace".
    [Cloudflare's docs](https://developers.cloudflare.com/waf/managed-rules/)). Confirm in the dashboard.
 5. Turn on two-step sign-in for the Cloudflare account.
 
+## 2b. Email (Resend) (owner)
+Order confirmations (with the invoice attached) are sent through Resend.
+1. Create a Resend account and add your domain. Resend shows the DNS records to add (including SPF
+   and DKIM); add them in Cloudflare's DNS settings and wait for Resend to show the domain as verified.
+   Until it is verified you can only send test emails; confirmations to real customers need it.
+2. Create an API key in Resend and put it in Render as `RESEND_API_KEY`. Set `EMAIL_FROM` to an address
+   on the verified domain, for example `The Cable Store <orders@yourdomain.com>`. Optionally set
+   `ORDER_COPY_EMAIL` to receive a private copy of every confirmation (a "new order" notice).
+3. Check Resend's current free-plan limits and pricing on its own pricing page (a secondary source
+   quotes 100 emails a day and 3,000 a month) and that they are enough for your order volume.
+4. Add Resend to the privacy notice you publish on the website, as the service that sends order emails.
+If an email fails, the order is still saved. The Orders page shows the problem and a "Send now" button.
+
 ## 3. Before this can carry real data
 Listings now use Postgres whenever `DATABASE_URL` is set (without it the app falls back to a local
 file, which is only for development). The schema and first migration are in `prisma/`. The
