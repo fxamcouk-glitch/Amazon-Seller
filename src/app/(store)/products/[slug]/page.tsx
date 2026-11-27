@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { productStore } from "@/lib/catalogue";
 import { formatPounds } from "@/lib/stats";
+import { variantsFor } from "@/lib/variants";
+import { VariantPicker } from "@/components/variant-picker";
 import { DESCRIPTION_MAX, breadcrumbJsonLd, breadcrumbTrail, fullTitle, jsonLdString, productJsonLd, productPath, truncate } from "@/lib/seo-meta";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -37,6 +39,7 @@ export default async function ProductPage({ params }: Props) {
   if (!product) notFound();
 
   const trail = breadcrumbTrail(product);
+  const variants = variantsFor(product, await productStore.listPublished());
 
   return (
     <article>
@@ -83,6 +86,9 @@ export default async function ProductPage({ params }: Props) {
         <h1 className="text-2xl font-semibold">{product.name}</h1>
         <p className="mt-2 text-2xl font-semibold tabular-nums">{formatPounds(product.pricePence)}</p>
         <p className="mt-1 text-sm text-muted">{product.inStock ? "In stock" : "Out of stock"} · Free UK delivery</p>
+
+        <VariantPicker label="Colour and style" options={variants.colours} />
+        <VariantPicker label="Length" options={variants.lengths} />
 
         {product.description.map((p, i) => (
           <p key={i} className="mt-4 max-w-2xl">{p}</p>

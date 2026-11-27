@@ -18,9 +18,19 @@ export default async function StoreHome() {
   const products = await productStore.listPublished();
   return (
     <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/hero.webp"
+        alt="Red round, black and white zig zag, and red twisted fabric braided lighting cable"
+        width={1600}
+        height={320}
+        fetchPriority="high"
+        className="mb-6 aspect-[5/1] w-full rounded-lg object-cover"
+      />
       <h1 className="text-3xl font-semibold">Braided fabric cable for lamps and lighting</h1>
       <p className="mt-2 max-w-2xl text-muted">
-        Three core textile flex for lamp rewires and pendant lights, dispatched from the UK.
+        Three core textile flex for lamp rewires and pendant lights, dispatched from the UK. Not sure which to
+        pick? Read <Link href="/guides/choosing-fabric-lighting-cable" className="text-accent underline">how to choose your cable</Link>.
       </p>
       {products.length === 0 && <p className="mt-8 text-muted">Our products are coming soon.</p>}
       {groupForShop(products).map((group) => (

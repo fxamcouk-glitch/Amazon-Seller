@@ -10,5 +10,10 @@ export const dynamic = "force-dynamic";
 // modified date. Add lastModified per product once products carry one.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const products = await productStore.listPublished();
-  return [{ url: SITE_URL }, ...products.map((p) => ({ url: `${SITE_URL}${productPath(p)}` }))];
+  const pages = ["/guides/choosing-fabric-lighting-cable", "/delivery-and-returns", "/contact", "/terms", "/privacy"];
+  return [
+    { url: SITE_URL },
+    ...pages.map((path) => ({ url: `${SITE_URL}${path}` })),
+    ...products.map((p) => ({ url: `${SITE_URL}${productPath(p)}` })),
+  ];
 }

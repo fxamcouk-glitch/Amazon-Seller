@@ -7,7 +7,7 @@
   --color-line: #dfe2e8;
   --color-ink: #16181d;
   --color-muted: #5a6170;
-  --color-accent: #1d4ed8;
+  --color-accent: #b4382f; /* deep coral from the logo; 5.9:1 against white text */
   --color-accent-ink: #ffffff;
   --color-good: #166534;
   --color-good-bg: #dcfce7;
@@ -29,7 +29,7 @@
     --color-line: #2c313b;
     --color-ink: #eef0f4;
     --color-muted: #a3aab8;
-    --color-accent: #7aa2ff;
+    --color-accent: #ff9a8f;
     --color-accent-ink: #0f1115;
     --color-good: #86efac;
     --color-good-bg: #14301f;
