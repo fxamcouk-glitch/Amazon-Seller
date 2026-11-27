@@ -12,6 +12,20 @@ Render puts services in the same workspace and region on one private network. Th
 this system's network, access and billing apart, which is what Amazon's "network segmentation"
 control is about. Do not deploy into "My Workspace".
 
+## 1-quick. Deploy with the Blueprint (owner, no connector needed)
+`render.yaml` in the repository describes the whole setup: the database (`basic-256mb`, $6/month,
+no outside access) and the web service (`starter`, $7/month, Frankfurt), about $13/month in total
+(prices checked on render.com/pricing on 2026-11-27). It holds no secrets. To deploy:
+1. In the TheCableStore workspace (signed in as the business email) choose **New > Blueprint**.
+2. Connect GitHub when asked and pick this repository and the branch to deploy.
+3. Render lists the variables marked `sync: false`. Type the values in yourself: first only
+   `ADMIN_PASSWORD`, the business details, and Stripe **test** keys. Leave the rest empty for now.
+   Do not paste any of these values into a chat.
+4. Press **Apply**. Render builds, applies the database migrations and starts the site.
+5. Continue with the sign-in setup and Cloudflare steps below. Add the domain under the web
+   service's Settings > Custom Domains (Hobby allows two: the bare domain and `www`).
+The numbered steps in the next section describe the same setup done by hand.
+
 ## 1. Render (owner, then Claude)
 1. (owner) Create a new workspace named for the business, for example "TheCableStore". Check
    the plan and price shown before confirming.

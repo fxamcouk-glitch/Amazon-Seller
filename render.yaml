@@ -1,0 +1,72 @@
+# Render Blueprint for The Cable Store. Deploy it from the TheCableStore workspace:
+# Render dashboard > New > Blueprint > pick this repository. See docs/render-cloudflare-setup.md.
+#
+# Costs (checked on render.com/pricing, 2026-11-27): web service $7/month, database $6/month.
+# Secrets are NOT in this file. Every variable marked `sync: false` is typed into Render's
+# dashboard by the owner when the Blueprint asks for it. Never write a secret value in this file.
+
+databases:
+  - name: cablestore-db
+    plan: basic-256mb # $6/month. Can be moved up to a bigger plan later without losing data.
+    region: frankfurt # nearest Render region to the UK. The website below must use the same region.
+    databaseName: cablestore
+    user: cablestore
+    ipAllowList: [] # no outside access at all: only the website on Render's private network can connect
+
+services:
+  - type: web
+    name: cablestore-web
+    runtime: node
+    plan: starter # $7/month, 512 MB. Move up if it runs out of memory.
+    region: frankfurt
+    buildCommand: npm ci --include=dev && npm run build
+    preDeployCommand: npx prisma migrate deploy # applies database changes before each new version goes live
+    startCommand: npm run start
+    healthCheckPath: /robots.txt
+    autoDeploy: false # nothing goes live until the owner presses Deploy
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cablestore-db
+          property: connectionString # the private (internal) address
+      - key: SITE_URL
+        value: https://thecable.store
+      - key: SESSION_HOURS
+        value: "12"
+      - key: SP_API_REGION
+        value: eu
+      - key: SP_API_SANDBOX
+        value: "true" # stays on the Amazon test system until the owner says otherwise
+      # Dashboard sign-in. Set only ADMIN_PASSWORD first, then follow /login/setup for the other two.
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_TOTP_SECRET
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+      # Payments (use Stripe test keys until everything is checked)
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      # Printed on invoices
+      - key: BUSINESS_NAME
+        sync: false
+      - key: BUSINESS_ADDRESS
+        sync: false
+      - key: BUSINESS_EMAIL
+        sync: false
+      # Order emails (Resend)
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      # Optional: leave empty if not needed
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: SELLING_PARTNER_APP_CLIENT_ID
+        sync: false
+      - key: SELLING_PARTNER_APP_CLIENT_SECRET
+        sync: false
+      - key: SP_API_REFRESH_TOKEN
+        sync: false
