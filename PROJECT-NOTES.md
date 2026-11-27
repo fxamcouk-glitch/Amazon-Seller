@@ -223,3 +223,9 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
   - All 7 A records (including the missing `mcp` → 213.171.195.10, added by hand) are set to DNS only, matching Fasthosts.
   - Assigned nameservers: barbara.ns.cloudflare.com and milan.ns.cloudflare.com. Fasthosts has not been changed yet.
   - DNSSEC is off (no DS record), so the switch is safe.
+- **Nameservers switched (2026-11-27, owner approved):**
+  - Fasthosts nameservers for thecable.store changed from ns1–ns3.livedns.co.uk to barbara.ns.cloudflare.com and milan.ns.cloudflare.com. Fasthosts showed "Update request processed".
+  - Cloudflare already answers correctly (A 88.208.252.9, Google MX), and the website still frames the Brand Store.
+  - The registry was still propagating at the time of writing.
+  - Undo: put ns1, ns2 and ns3.livedns.co.uk back in Fasthosts.
+  - DNS is now managed in Cloudflare; the Fasthosts Advanced DNS page no longer has any effect.
