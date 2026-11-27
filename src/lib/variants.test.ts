@@ -24,9 +24,12 @@ describe("variants", () => {
     expect(familyOf(black3).key).toBe(familyOf(black5).key);
   });
 
-  it("lists every length of the style with its price, shortest first", () => {
+  it("lists every length of the style with price, price per metre and best value", () => {
     const v = variantsFor(black3, all);
-    expect(v.lengths.map((o) => [o.label, o.current, o.inStock])).toEqual([["3m · £11.99", true, true], ["5m · £15.99", false, false]]);
+    expect(v.lengths.map((o) => [o.label, o.current, o.inStock, o.pricePence, o.perMetrePence, o.best])).toEqual([
+      ["3m", true, true, 1199, 400, false],
+      ["5m", false, false, 1599, 320, true],
+    ]);
   });
 
   it("lists colours at the same length, or the nearest length when missing", () => {
@@ -35,6 +38,13 @@ describe("variants", () => {
       ["Red Round", red3.slug, false],
       ["Red Twisted", twisted10.slug, false],
     ]);
+  });
+
+  it("marks a colour unavailable only when every length is out of stock", () => {
+    const blackOut = { ...black3, inStock: false };
+    const v = variantsFor(red3, [blackOut, black5, red3]);
+    expect(v.colours.map((o) => [o.label, o.available])).toEqual([["Black Round", false], ["Red Round", true]]);
+    expect(variantsFor(red3, all).colours.find((o) => o.label === "Black Round")?.available).toBe(true);
   });
 
   it("links the lamp holder styles to each other in a fixed order", () => {

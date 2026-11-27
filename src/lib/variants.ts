@@ -1,5 +1,4 @@
 import type { Product } from "./catalogue";
-import { formatPounds } from "./stats";
 
 // Fabric cables share one SKU pattern: TCS-<RD|TW>-3CORE-<COLOUR>-<N>M, for example
 // TCS-RD-3CORE-BLACK/WHITE/ZZ-5M. Ceramic lamp holders: CERAMIC-E27-LAMPHOLDER-<STYLE>.
@@ -7,7 +6,17 @@ const CABLE_SKU = /^TCS-(RD|TW)-3CORE-(.+)-(\d+)M$/;
 const LAMPHOLDER_SKU = /^CERAMIC-E27-LAMPHOLDER-(.+)$/;
 const LAMPHOLDER_ORDER = ["STRAIGHT", "ANGLED", "RIGHTANGLED"];
 
-export type VariantOption = { label: string; slug: string; inStock: boolean; current: boolean };
+export type VariantOption = {
+  label: string;
+  slug: string;
+  inStock: boolean;
+  current: boolean;
+  image?: string; // swatch photo (colours, styles)
+  pricePence?: number; // lengths
+  perMetrePence?: number; // lengths: price divided by metres, rounded
+  best?: boolean; // lengths: the lowest price per metre
+  available?: boolean; // colours: in stock in at least one length
+};
 export type Variants = { lengths: VariantOption[]; colours: VariantOption[]; styles: VariantOption[] };
 
 // "Black & White Zig Zag Round Fabric Lighting Flex, …" -> "Black & White Zig Zag Round"
@@ -35,7 +44,7 @@ const lampHolderOrder = (sku: string): number => {
 };
 
 const option = (p: Product, current: Product, label: string): VariantOption => ({
-  label, slug: p.slug, inStock: p.inStock, current: p.sku === current.sku,
+  label, slug: p.slug, inStock: p.inStock, current: p.sku === current.sku, ...(p.image ? { image: p.image } : {}),
 });
 
 // The choices shown on a product page: every length of this style (with its price), the same
@@ -54,7 +63,12 @@ export function variantsFor(product: Product, all: Product[]): Variants {
   if (!me.key.startsWith("cable-")) return none;
   const family = all.filter((p) => familyOf(p).key === me.key).sort((a, b) => familyOf(a).order - familyOf(b).order);
 
-  const lengths = family.map((p) => option(p, product, `${familyOf(p).option} · ${formatPounds(p.pricePence)}`));
+  const lengths: VariantOption[] = family.map((p) => {
+    const metres = familyOf(p).order;
+    return { ...option(p, product, familyOf(p).option), pricePence: p.pricePence, perMetrePence: Math.round(p.pricePence / metres) };
+  });
+  const cheapest = Math.min(...lengths.map((l) => l.perMetrePence ?? Infinity));
+  if (lengths.length > 1) for (const l of lengths) l.best = l.perMetrePence === cheapest;
 
   const byColour = new Map<string, Product[]>();
   for (const p of all) {
@@ -66,7 +80,14 @@ export function variantsFor(product: Product, all: Product[]): Variants {
       const pick =
         group.find((p) => familyOf(p).order === me.order) ??
         [...group].sort((a, b) => Math.abs(familyOf(a).order - me.order) - Math.abs(familyOf(b).order - me.order))[0];
-      return { label: colourLabel(pick.name), slug: pick.slug, inStock: pick.inStock, current: key === me.key };
+      return {
+        label: colourLabel(pick.name),
+        slug: pick.slug,
+        inStock: pick.inStock,
+        current: key === me.key,
+        available: group.some((p) => p.inStock),
+        ...(pick.image ? { image: pick.image } : {}),
+      };
     })
     .sort((a, b) => a.label.localeCompare(b.label));
 

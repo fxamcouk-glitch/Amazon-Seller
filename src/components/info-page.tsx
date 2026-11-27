@@ -3,7 +3,7 @@
 export function InfoPage({ title, intro, draft, children }: { title: string; intro?: string; draft?: boolean; children: React.ReactNode }) {
   return (
     <article className="max-w-3xl">
-      <h1 className="text-3xl font-semibold">{title}</h1>
+      <h1 className="font-[family-name:var(--font-display)] text-[28px] font-extrabold leading-tight tracking-tight sm:text-[34px]">{title}</h1>
       {intro && <p className="mt-2 text-muted">{intro}</p>}
       {draft && (
         <p role="note" className="mt-4 rounded-md border border-line bg-warn-bg px-4 py-3 text-sm text-warn">

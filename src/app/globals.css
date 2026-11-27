@@ -3,14 +3,17 @@
 /* The single place for shared values. Pages use these tokens, never raw colours. */
 @theme static {
   --color-surface: #ffffff;
-  --color-page: #f5f6f8;
-  --color-line: #dfe2e8;
+  --color-page: #f7f5f2; /* warm off-white */
+  --color-line: #e4e0da;
+  --color-line-strong: #cfc9c0; /* form controls, swatch rings */
+  --color-quiet: #efedea; /* out-of-stock pills, unavailable tiles */
   --color-ink: #16181d;
-  --color-muted: #5a6170;
+  --color-muted: #5a5f6b;
   --color-accent: #b4382f; /* deep coral from the logo; 5.9:1 against white text */
   --color-accent-ink: #ffffff;
-  --color-good: #166534;
-  --color-good-bg: #dcfce7;
+  --color-accent-soft: #fbefed; /* selected tiles, icon circles */
+  --color-good: #1d6b3a;
+  --color-good-bg: #e8f3ec;
   --color-warn: #854d0e;
   --color-warn-bg: #fef3c7;
   --color-bad: #991b1b;
@@ -19,7 +22,8 @@
   --color-amazon: #d97706;
   --color-shopify: #15803d;
   --color-website: #1d4ed8;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-manrope), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -27,10 +31,13 @@
     --color-surface: #1a1d24;
     --color-page: #0f1115;
     --color-line: #2c313b;
+    --color-line-strong: #434a57;
+    --color-quiet: #242830;
     --color-ink: #eef0f4;
     --color-muted: #a3aab8;
     --color-accent: #ff9a8f;
     --color-accent-ink: #0f1115;
+    --color-accent-soft: #3a2220;
     --color-good: #86efac;
     --color-good-bg: #14301f;
     --color-warn: #fcd34d;
@@ -47,4 +54,13 @@ body {
   background: var(--color-page);
   color: var(--color-ink);
   font-family: var(--font-sans);
+}
+
+/* A row that scrolls sideways on narrow screens without showing a scrollbar (main menu). */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Phones: room at the bottom of the product page for the fixed "Buy now" bar. */
+@media (max-width: 639px) {
+  body:has(#buy-form) { padding-bottom: 80px; }
 }
