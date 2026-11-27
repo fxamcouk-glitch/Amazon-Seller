@@ -217,3 +217,9 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - **Once DNS is on Cloudflare:**
   - Keep @ and www as DNS-only until the Render site is live.
   - Add SPF `v=spf1 include:_spf.google.com ~all`, Google DKIM (generated in Admin → Apps → Gmail → Authenticate email), DMARC, and later the Resend records.
+- **Cloudflare (2026-11-27):**
+  - Free account on hello@thecable.store; thecable.store added on the Free plan.
+  - The scan copied all 5 Google MX records and the 3 TXT records.
+  - All 7 A records (including the missing `mcp` → 213.171.195.10, added by hand) are set to DNS only, matching Fasthosts.
+  - Assigned nameservers: barbara.ns.cloudflare.com and milan.ns.cloudflare.com. Fasthosts has not been changed yet.
+  - DNSSEC is off (no DS record), so the switch is safe.
