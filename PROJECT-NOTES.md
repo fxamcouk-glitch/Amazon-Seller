@@ -243,3 +243,6 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
   - The earlier "Deploy failed" was a blueprint sync running the new pre-deploy command on the old commit; the live site was unaffected.
   - Each deploy runs `scripts/import-catalogue.ts`, which only adds missing SKUs.
   - Work on the site happens in the worktree ~/cablestore-site.
+- **Site update deployed (2026-11-27, owner said "deploy it"):**
+  - Commit f48eff3 adds the colour and length picker, logo, banner and coral accent, the delivery/returns, contact, terms and privacy pages, and the "How to choose fabric lighting cable" guide. All live pages return 200.
+  - Draft gaps for the owner: dispatch days, who pays return postage, a registered office address (needed by law; not the home address), email provider, record retention period.
