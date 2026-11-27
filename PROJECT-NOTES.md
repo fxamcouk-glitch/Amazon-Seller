@@ -229,3 +229,4 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
   - The registry was still propagating at the time of writing.
   - Undo: put ns1, ns2 and ns3.livedns.co.uk back in Fasthosts.
   - DNS is now managed in Cloudflare; the Fasthosts Advanced DNS page no longer has any effect.
+- **Render (2026-11-27):** account hello@thecable.store, signed in with Google. Workspace renamed to "The Cable Store", on the free Hobby plan. No card added and no services created.
