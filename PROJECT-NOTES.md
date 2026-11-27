@@ -246,3 +246,9 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - **Site update deployed (2026-11-27, owner said "deploy it"):**
   - Commit f48eff3 adds the colour and length picker, logo, banner and coral accent, the delivery/returns, contact, terms and privacy pages, and the "How to choose fabric lighting cable" guide. All live pages return 200.
   - Draft gaps for the owner: dispatch days, who pays return postage, a registered office address (needed by law; not the home address), email provider, record retention period.
+- **Pushed, not yet deployed (2026-11-27):**
+  - 54933e0: one listing per colour/style, the listing's own photos, and an import that refreshes untouched products.
+  - f781fb5: the new design (Fable-refined mock-ups in the "Shop Design Ideas" canvas), built for phones first.
+    - It has a phone Buy now bar, swatches and length tiles, and "Same price in every colour" (shown only when true).
+    - Best-seller badge: BADGES in src/lib/storefront.ts.
+  - Deploy only when the owner says so (Render → cablestore-web → Manual Deploy → Deploy latest commit).
