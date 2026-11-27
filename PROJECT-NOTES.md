@@ -199,3 +199,21 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
   - Ceramic A+ "Ceramic lighting range" (23607a5f-9a51-4097-98e3-dd633267f04d) built with `scripts/aplus-ceramics.ts` and linked to 4 ASINs. Submitted on the owner's instruction; approved and published 2026-11-24.
   - Support case drafted (Linen ZZ 5m/10m/50m part numbers, Oatmeal 5m brand); waiting for owner approval to send.
 - Receipts check (2026-11-26): automatic receipts are working. Orders placed after the VAT exemption declaration show an "Amazon generated" invoice PDF (for example 026-6822431-8065153 on 24 Nov and 204-2914089-4944308 on 26 Nov). 0 orders are flagged "No Invoice Uploaded" in the last 30 days, for both FBA and MFN. The June backlog receipt has cleared. The easybill subscription was already cancelled.
+
+## Domain and email (checked 2026-11-27)
+
+- The shop domain is **thecable.store**, registered at Fasthosts until 2027-11-01 with auto-renew on. Keep it at Fasthosts; do not transfer it. There is no thecablestore.co.uk in the Fasthosts account.
+- **Nameservers:** ns1, ns2 and ns3.livedns.co.uk (Fasthosts). The plan is to move DNS to Cloudflare (free plan) after the owner approves.
+- **DNS records at Fasthosts:**
+  - A records: @ and www → 88.208.252.9. This is Fasthosts web forwarding, framing the Amazon Brand Store, titled "www.TheCable.Store".
+  - Leftover A records: mail and mailserver 213.171.216.40, smtp .50, webmail .231, mcp 213.171.195.10.
+  - MX: Google Workspace (ASPMX.L.GOOGLE.COM priority 1; ALT1 and ALT2 priority 5; ALT3 and ALT4 priority 10).
+  - TXT: Facebook, Pinterest and Google site verification.
+  - No SPF, DKIM or DMARC. The SPF and DMARC that Fasthosts "suggests" are for Fasthosts mail: do NOT apply them.
+- **Google Workspace:**
+  - Business Starter, £7/month, 1 licence. hello@thecable.store is Active, a Super Admin, and Gmail is ON.
+  - The domain is verified. MX is complete; SPF and DKIM are missing.
+  - A test email to hello@ bounced on 2026-11-27 with 5.1.1 NoSuchUser, although the mailbox opens fine (it has never received mail). Retest; if it still bounces after 24 hours, contact Google Workspace support.
+- **Once DNS is on Cloudflare:**
+  - Keep @ and www as DNS-only until the Render site is live.
+  - Add SPF `v=spf1 include:_spf.google.com ~all`, Google DKIM (generated in Admin → Apps → Gmail → Authenticate email), DMARC, and later the Resend records.
