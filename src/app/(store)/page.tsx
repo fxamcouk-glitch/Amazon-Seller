@@ -3,8 +3,7 @@ import Link from "next/link";
 import { productStore } from "@/lib/catalogue";
 import { formatPounds } from "@/lib/stats";
 import { thumbUrl } from "@/lib/images/store";
-import { productPath } from "@/lib/seo-meta";
-import { groupForShop } from "@/lib/storefront";
+import { sectionsForShop } from "@/lib/storefront";
 
 export const metadata: Metadata = {
   title: { absolute: "Braided Fabric Cable for Lamps and Lights | The Cable Store" },
@@ -33,18 +32,18 @@ export default async function StoreHome() {
         pick? Read <Link href="/guides/choosing-fabric-lighting-cable" className="text-accent underline">how to choose your cable</Link>.
       </p>
       {products.length === 0 && <p className="mt-8 text-muted">Our products are coming soon.</p>}
-      {groupForShop(products).map((group) => (
-        <section key={group.id} aria-labelledby={group.id} className="mt-10">
-          <h2 id={group.id} className="text-2xl font-semibold">{group.title}</h2>
-          <p className="mt-1 max-w-2xl text-muted">{group.intro}</p>
+      {sectionsForShop(products).map((section) => (
+        <section key={section.id} aria-labelledby={section.id} className="mt-10 scroll-mt-4">
+          <h2 id={section.id} className="text-2xl font-semibold">{section.title}</h2>
+          <p className="mt-1 max-w-2xl text-muted">{section.intro}</p>
           <ul className="mt-5 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-            {group.products.map((p) => (
-              <li key={p.slug} className="flex flex-col rounded-lg border border-line bg-surface p-3">
-                {p.image && (
+            {section.listings.map((l) => (
+              <li key={l.key} className="flex flex-col rounded-lg border border-line bg-surface p-3">
+                {l.image && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={thumbUrl(p.image)}
-                    alt={p.imageAlt || p.name}
+                    src={thumbUrl(l.image)}
+                    alt={l.imageAlt || l.title}
                     width={400}
                     height={400}
                     loading="lazy"
@@ -52,14 +51,18 @@ export default async function StoreHome() {
                   />
                 )}
                 <h3 className="text-sm font-semibold leading-snug">
-                  <Link href={productPath(p)} className="hover:underline focus-visible:outline-2 focus-visible:outline-accent">
-                    {p.name}
+                  <Link href={`/products/${l.slug}`} className="hover:underline focus-visible:outline-2 focus-visible:outline-accent">
+                    {l.title}
                   </Link>
                 </h3>
+                {l.options.length > 0 && <p className="mt-1 text-xs text-muted">{l.options.join(" · ")}</p>}
                 <p className="mt-auto flex items-baseline justify-between gap-2 pt-3">
-                  <span className="text-lg font-semibold tabular-nums">{formatPounds(p.pricePence)}</span>
-                  <span className={p.inStock ? "text-xs text-muted" : "text-xs font-semibold text-muted"}>
-                    {p.inStock ? "In stock" : "Out of stock"}
+                  <span className="text-lg font-semibold tabular-nums">
+                    {l.priceVaries && <span className="text-sm font-normal text-muted">from </span>}
+                    {formatPounds(l.fromPence)}
+                  </span>
+                  <span className={l.inStock ? "text-xs text-muted" : "text-xs font-semibold text-muted"}>
+                    {l.inStock ? "In stock" : "Out of stock"}
                   </span>
                 </p>
               </li>

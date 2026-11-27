@@ -36,6 +36,8 @@ model Product {
   inStock     Boolean   @default(true)
   published   Boolean   @default(false)
   image       String? // /media/<id>.webp for an uploaded image, or an https address
+  importedAt       DateTime? // when scripts/import-catalogue.ts last wrote this product from Amazon data
+  importedImageUrl String? // the Amazon photo address that import last stored, to spot a changed photo
   imageAlt    String    @default("") // description of the image, for accessibility and search
   listings    Listing[]
   createdAt   DateTime  @default(now())

@@ -89,6 +89,7 @@ export default async function ProductPage({ params }: Props) {
 
         <VariantPicker label="Colour and style" options={variants.colours} />
         <VariantPicker label="Length" options={variants.lengths} />
+        <VariantPicker label="Style" options={variants.styles} />
 
         {product.description.map((p, i) => (
           <p key={i} className="mt-4 max-w-2xl">{p}</p>
