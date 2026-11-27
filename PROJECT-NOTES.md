@@ -236,3 +236,10 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
   - The home, /login and /login/setup pages all load. The shop has no products yet ("Our products are coming soon").
   - Values set: ADMIN_PASSWORD (owner) and BUSINESS_NAME/ADDRESS/EMAIL. All other variables are empty, including Stripe (no account yet).
   - thecable.store still points at the Fasthosts Brand Store forwarding.
+- **Shop catalogue live (2026-11-27, owner said "deploy it"):**
+  - Commit b204aa4 on claude/charming-bohr-8s2vp7 was deployed manually and is Live.
+  - All 49 products were exported from Amazon (`scripts/export-site-catalogue.ts`) and are now in the live database with photos stored in it.
+  - The home page is grouped into cables and ceramics.
+  - The earlier "Deploy failed" was a blueprint sync running the new pre-deploy command on the old commit; the live site was unaffected.
+  - Each deploy runs `scripts/import-catalogue.ts`, which only adds missing SKUs.
+  - Work on the site happens in the worktree ~/cablestore-site.
