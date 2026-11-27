@@ -213,7 +213,7 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
 - **Google Workspace:**
   - Business Starter, £7/month, 1 licence. hello@thecable.store is Active, a Super Admin, and Gmail is ON.
   - The domain is verified. MX is complete; SPF and DKIM are missing.
-  - A test email to hello@ bounced on 2026-11-27 with 5.1.1 NoSuchUser, although the mailbox opens fine (it has never received mail). Retest; if it still bounces after 24 hours, contact Google Workspace support.
+  - A test email to hello@ bounced on 2026-11-27 with 5.1.1 NoSuchUser, although the mailbox opens fine (it has never received mail). After the mailbox was opened in Gmail, test 2 was received the same morning. Receiving works.
 - **Once DNS is on Cloudflare:**
   - Keep @ and www as DNS-only until the Render site is live.
   - Add SPF `v=spf1 include:_spf.google.com ~all`, Google DKIM (generated in Admin → Apps → Gmail → Authenticate email), DMARC, and later the Resend records.
