@@ -230,3 +230,9 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
   - Undo: put ns1, ns2 and ns3.livedns.co.uk back in Fasthosts.
   - DNS is now managed in Cloudflare; the Fasthosts Advanced DNS page no longer has any effect.
 - **Render (2026-11-27):** account hello@thecable.store, signed in with Google. Workspace renamed to "The Cable Store", on the free Hobby plan. No card added and no services created.
+- **Render deploy (2026-11-27, owner clicked Deploy Blueprint; $13/month):**
+  - Blueprint "The Cable Store shop" from branch claude/charming-bohr-8s2vp7.
+  - cablestore-web is Deployed/Live at https://cablestore-web.onrender.com; cablestore-db is Available (PostgreSQL 18). Both in Frankfurt.
+  - The home, /login and /login/setup pages all load. The shop has no products yet ("Our products are coming soon").
+  - Values set: ADMIN_PASSWORD (owner) and BUSINESS_NAME/ADDRESS/EMAIL. All other variables are empty, including Stripe (no account yet).
+  - thecable.store still points at the Fasthosts Brand Store forwarding.
