@@ -48,7 +48,8 @@ async function stockBySku() {
 
 async function mainImage(asin: string): Promise<string | null> {
   const r: any = await spGet(cfg, `/catalog/2022-04-01/items/${asin}`, { marketplaceIds: MP, includedData: "images" });
-  const imgs: any[] = r.images?.[0]?.images ?? [];
+  // Amazon returns one photo set per marketplace; use the UK one, not whichever comes first.
+  const imgs: any[] = (r.images ?? []).find((s: any) => s.marketplaceId === MP)?.images ?? [];
   const main = imgs.filter((i) => i.variant === "MAIN").sort((a, b) => b.width - a.width)[0];
   return main?.link ?? null;
 }
@@ -117,7 +118,10 @@ async function main() {
       ];
     }
 
-    const imageUrl = s?.asin ? await mainImage(s.asin) : null;
+    // The seller's own main photo (listing attribute) is the right colour; Amazon's shared catalogue
+    // record often holds a generic photo from another length or colour. Fall back to it only if needed.
+    const ownImage: string | undefined = a.main_product_image_locator?.[0]?.media_location;
+    const imageUrl = ownImage ?? (s?.asin ? await mainImage(s.asin) : null);
     products.push({
       sku, asin: s?.asin ?? "", name: title, displayName, slug: slugify(displayName), pricePence: Math.round(price * 100),
       summary: firstSentence(desc) || displayName, description: paragraphs(desc), specs, inStock: stock > 0,
