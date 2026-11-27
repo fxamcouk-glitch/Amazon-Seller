@@ -4,6 +4,7 @@ import { productStore } from "@/lib/catalogue";
 import { formatPounds } from "@/lib/stats";
 import { thumbUrl } from "@/lib/images/store";
 import { productPath } from "@/lib/seo-meta";
+import { groupForShop } from "@/lib/storefront";
 
 export const metadata: Metadata = {
   title: { absolute: "Braided Fabric Cable for Lamps and Lights | The Cable Store" },
@@ -22,30 +23,40 @@ export default async function StoreHome() {
         Three core textile flex for lamp rewires and pendant lights, dispatched from the UK.
       </p>
       {products.length === 0 && <p className="mt-8 text-muted">Our products are coming soon.</p>}
-      <ul className="mt-8 grid gap-4 sm:grid-cols-2">
-        {products.map((p) => (
-          <li key={p.slug} className="rounded-lg border border-line bg-surface p-4">
-            {p.image && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={thumbUrl(p.image)}
-                alt={p.imageAlt || p.name}
-                width={400}
-                height={400}
-                loading="lazy"
-                className="mb-3 aspect-square w-full rounded-md border border-line bg-white object-contain"
-              />
-            )}
-            <h2 className="font-semibold">
-              <Link href={productPath(p)} className="hover:underline focus-visible:outline-2 focus-visible:outline-accent">
-                {p.name}
-              </Link>
-            </h2>
-            <p className="mt-1 text-sm text-muted">{p.summary}</p>
-            <p className="mt-3 text-lg font-semibold tabular-nums">{formatPounds(p.pricePence)}</p>
-          </li>
-        ))}
-      </ul>
+      {groupForShop(products).map((group) => (
+        <section key={group.id} aria-labelledby={group.id} className="mt-10">
+          <h2 id={group.id} className="text-2xl font-semibold">{group.title}</h2>
+          <p className="mt-1 max-w-2xl text-muted">{group.intro}</p>
+          <ul className="mt-5 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+            {group.products.map((p) => (
+              <li key={p.slug} className="flex flex-col rounded-lg border border-line bg-surface p-3">
+                {p.image && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={thumbUrl(p.image)}
+                    alt={p.imageAlt || p.name}
+                    width={400}
+                    height={400}
+                    loading="lazy"
+                    className="mb-3 aspect-square w-full rounded-md border border-line bg-white object-contain"
+                  />
+                )}
+                <h3 className="text-sm font-semibold leading-snug">
+                  <Link href={productPath(p)} className="hover:underline focus-visible:outline-2 focus-visible:outline-accent">
+                    {p.name}
+                  </Link>
+                </h3>
+                <p className="mt-auto flex items-baseline justify-between gap-2 pt-3">
+                  <span className="text-lg font-semibold tabular-nums">{formatPounds(p.pricePence)}</span>
+                  <span className={p.inStock ? "text-xs text-muted" : "text-xs font-semibold text-muted"}>
+                    {p.inStock ? "In stock" : "Out of stock"}
+                  </span>
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
     </>
   );
 }

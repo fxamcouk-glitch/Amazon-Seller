@@ -20,7 +20,7 @@ services:
     plan: starter # $7/month, 512 MB. Move up if it runs out of memory.
     region: frankfurt
     buildCommand: npm ci --include=dev && npm run build
-    preDeployCommand: npx prisma migrate deploy # applies database changes before each new version goes live
+    preDeployCommand: npx prisma migrate deploy && npx tsx scripts/import-catalogue.ts # applies database changes, then adds any new products from prisma/catalogue/products.json (never overwrites edits)
     startCommand: npm run start
     healthCheckPath: /robots.txt
     autoDeploy: false # nothing goes live until the owner presses Deploy
