@@ -253,3 +253,17 @@ Written 2026-10-24 so the planning from the first session isn't lost. This proje
     - Best-seller badge: BADGES in src/lib/storefront.ts.
   - Both commits are live. All pages return 200 and the home page shows 13 product cards.
   - Deploy method: Render → cablestore-web → Manual Deploy → Deploy latest commit. The Render connector can't see this workspace.
+- **Stripe (2026-11-28):** live account for Venture 58 Ltd (private company, CRN 14043490), signed in with hello@thecable.store.
+  - Activate Payments is done; the support phone number is hidden on receipts.
+  - The webhook "cablestore-web orders" is Active. It sends checkout.session.completed and async_payment_succeeded to /api/stripe/webhook.
+  - Still to do (owner pastes into Render): STRIPE_SECRET_KEY (sk_live_) and STRIPE_WEBHOOK_SECRET (whsec_).
+- **Amazon dispatch + stock (commit ae7963f, pushed, NOT deployed):**
+  - Paid orders go to MCF as TCS-<n>, in a plain box. This only happens when MCF_ENABLED=true.
+  - A 15-minute job copies stock and sends waiting orders. It also marks orders shipped with tracking.
+  - The wall light is merchant-fulfilled (self-dispatch, listing qty 12). Such orders are marked "You post this one".
+  - Needs on Render: SELLING_PARTNER_APP_CLIENT_ID/SECRET and SP_API_REFRESH_TOKEN (owner pastes these), SP_API_SANDBOX=false and SP_API_SELLER_ID.
+  - BLOCKER: Seller Central says MCF order creation is "blocked for GB due to payment failures".
+    - The Amazon balance is positive and the UK card (ending 1473, expires 2030) is valid, so Amazon Support needs to clear it.
+    - scripts/check-mcf.ts confirms it (the preview is refused).
+  - SITE_URL on Render is https://thecable.store, which still forwards to the Brand Store.
+    - Stripe's after-payment page would go there, so fix it before taking payments: point the domain at Render, or set SITE_URL to the onrender address.
