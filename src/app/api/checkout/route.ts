@@ -2,6 +2,9 @@ import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { productStore } from "@/lib/catalogue";
 import { SITE_URL } from "@/lib/site";
+import { liveAmazonClient } from "@/lib/amazon/live";
+import { fetchStock } from "@/lib/amazon/stock";
+import { getDb, hasDatabase } from "@/lib/db";
 
 // Creates a Stripe Checkout session. The price always comes from our catalogue,
 // never from the browser, and Stripe hosts the payment page.
@@ -14,6 +17,24 @@ export async function POST(request: Request) {
   const quantity = Number(form.get("quantity"));
   if (!product || !product.inStock || !Number.isInteger(quantity) || quantity < 1 || quantity > 20) {
     return new NextResponse("Invalid order.", { status: 400 });
+  }
+
+  // Check Amazon still has enough to post. If Amazon cannot be reached, the shop's own stock flag
+  // (already checked above, and refreshed every 15 minutes) is trusted.
+  // Products the owner posts are not stored at Amazon; their stock comes from the 15-minute check.
+  const amazon = liveAmazonClient();
+  const selfDispatch =
+    hasDatabase() && (await getDb().product.findUnique({ where: { sku: product.sku }, select: { selfDispatch: true } }))?.selfDispatch;
+  if (amazon && !selfDispatch) {
+    let available: number | undefined;
+    try {
+      available = (await fetchStock(amazon, [product.sku])).get(product.sku) ?? 0;
+    } catch (error) {
+      console.error(`Stock check for ${product.sku} failed; continuing:`, error instanceof Error ? error.message : error);
+    }
+    if (available !== undefined && available < quantity) {
+      return NextResponse.redirect(`${SITE_URL}/products/${product.slug}?available=${available}`, 303);
+    }
   }
 
   const stripe = new Stripe(key);

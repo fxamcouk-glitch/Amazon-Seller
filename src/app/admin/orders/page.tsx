@@ -4,6 +4,7 @@ import { getDb, hasDatabase } from "@/lib/db";
 import { listOrders } from "@/lib/orders";
 import { formatInvoiceNumber } from "@/lib/invoice";
 import { formatPounds } from "@/lib/stats";
+import { SELF_DISPATCH_NOTE } from "@/lib/amazon/fulfilment";
 
 export const dynamic = "force-dynamic";
 
@@ -44,7 +45,8 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
                   <th scope="col" className="py-2 pr-4 font-medium">Items</th>
                   <th scope="col" className="py-2 pr-4 text-right font-medium">Total</th>
                   <th scope="col" className="py-2 pr-4 font-medium">Invoice</th>
-                  <th scope="col" className="py-2 font-medium">Confirmation email</th>
+                  <th scope="col" className="py-2 pr-4 font-medium">Confirmation email</th>
+                  <th scope="col" className="py-2 font-medium">Amazon dispatch</th>
                 </tr>
               </thead>
               <tbody>
@@ -73,7 +75,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
                         </form>
                       )}
                     </td>
-                    <td className="py-2">
+                    <td className="py-2 pr-4">
                       {o.confirmationSentAt ? (
                         <span className="text-good">Sent {o.confirmationSentAt.toLocaleDateString("en-GB", { timeZone: "Europe/London" })}</span>
                       ) : (
@@ -84,6 +86,29 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
                           {o.confirmationSentAt ? "Send again" : "Send now"}
                         </button>
                       </form>
+                    </td>
+                    <td className="py-2">
+                      {o.shippedAt ? (
+                        <span className="text-good">
+                          Posted {o.shippedAt.toLocaleDateString("en-GB", { timeZone: "Europe/London" })}
+                          {o.trackingNumber && <span className="block text-muted">{o.carrier ? `${o.carrier} ` : ""}{o.trackingNumber}</span>}
+                        </span>
+                      ) : o.amazonSentAt ? (
+                        <span>With Amazon ({(o.amazonStatus ?? "received").toLowerCase()})</span>
+                      ) : o.status === "PAID" && o.amazonError === SELF_DISPATCH_NOTE ? (
+                        <span className="font-semibold text-warn">You post this one (not stored at Amazon)</span>
+                      ) : o.status === "PAID" ? (
+                        <>
+                          <span className="text-bad">{o.amazonError ?? "Not sent yet"}</span>
+                          <form method="post" action={`/api/admin/orders/${o.number}/amazon`} className="mt-1">
+                            <button type="submit" className="rounded-md border border-line px-3 py-1 text-sm focus-visible:outline-2 focus-visible:outline-accent">
+                              Send to Amazon
+                            </button>
+                          </form>
+                        </>
+                      ) : (
+                        <span className="text-muted">{o.status.toLowerCase()}</span>
+                      )}
                     </td>
                   </tr>
                 ))}

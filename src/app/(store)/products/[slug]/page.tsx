@@ -13,7 +13,7 @@ import { BuyBox } from "@/components/buy-box";
 import { ArrowIcon, Eyebrow, TrustList, display, focusRing } from "@/components/store";
 import { DESCRIPTION_MAX, breadcrumbJsonLd, fullTitle, jsonLdString, productJsonLd, productPath, truncate } from "@/lib/seo-meta";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = { params: Promise<{ slug: string }>; searchParams?: Promise<{ available?: string }> };
 
 // Products live in the database, which is not reachable while the site is being built, so these
 // pages are made on request. `cache` lets the page and its metadata share one lookup per request.
@@ -53,9 +53,12 @@ function keyFacts(p: Product): { value: string; label: string }[] {
   ].filter((f): f is { value: string; label: string } => Boolean(f));
 }
 
-export default async function ProductPage({ params }: Props) {
+export default async function ProductPage({ params, searchParams }: Props) {
   const product = await getProduct((await params).slug);
   if (!product) notFound();
+  // Set by the checkout when Amazon had fewer left than the customer asked for.
+  const availableParam = (await searchParams)?.available;
+  const available = availableParam !== undefined && /^\d+$/.test(availableParam) ? Number(availableParam) : undefined;
 
   const all = await productStore.listPublished();
   const variants = variantsFor(product, all);
@@ -148,7 +151,14 @@ export default async function ProductPage({ params }: Props) {
           <StyleOptions options={variants.styles} />
 
           <div className="mt-6 rounded-2xl border border-line bg-surface p-4 sm:p-[18px]">
-            {product.inStock ? (
+            {available !== undefined && (
+              <p role="alert" className="mb-3 rounded-lg bg-warn-bg px-3 py-2 text-sm text-warn">
+                {available === 0
+                  ? "Sorry, this has just sold out. Please choose another length or colour."
+                  : `Sorry, we only have ${available} left. Please lower the quantity and try again.`}
+              </p>
+            )}
+            {product.inStock && available !== 0 ? (
               <>
                 <p className="flex items-center gap-2 text-sm font-semibold text-good">
                   <span aria-hidden className="size-2 rounded-full bg-current" />

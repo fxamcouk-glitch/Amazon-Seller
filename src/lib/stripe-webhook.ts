@@ -4,6 +4,8 @@ import type { ProductStore } from "./catalogue";
 import type { EmailSender } from "./email/sender";
 import { sendOrderConfirmation, type ConfirmationResult } from "./order-email";
 import { recordPaidOrder } from "./orders";
+import { fulfilmentEnabled, sendOrderToAmazon, type SendResult } from "./amazon/fulfilment";
+import { liveAmazonClient } from "./amazon/live";
 
 export type WebhookOutcome = { status: number; body: Record<string, unknown> };
 
@@ -19,6 +21,7 @@ export async function handleStripeWebhook(args: {
   env?: Record<string, string | undefined>;
   products?: Pick<ProductStore, "getBySku">;
   sender?: EmailSender; // for tests
+  amazon?: Parameters<typeof sendOrderToAmazon>[2] | null; // for tests; defaults to the live client
 }): Promise<WebhookOutcome> {
   const { rawBody, signature, secret, db, env, products, sender } = args;
   if (!signature) return { status: 400, body: { error: "Missing signature" } };
@@ -34,6 +37,20 @@ export async function handleStripeWebhook(args: {
 
   try {
     const result = await recordPaidOrder(db, event.data.object as Stripe.Checkout.Session, env, products);
+
+    // Ask Amazon to post the order. A failure is recorded on the order and retried every 15 minutes
+    // (and from the Orders page); it never stops the order being saved or the customer emailed.
+    let amazonResult: SendResult | undefined;
+    if (result.status !== "ignored" && fulfilmentEnabled(env ?? process.env)) {
+      const amazon = args.amazon === undefined ? liveAmazonClient(env ?? process.env) : args.amazon;
+      if (amazon) {
+        try {
+          amazonResult = await sendOrderToAmazon(db, result.orderId, amazon);
+        } catch (error) {
+          console.error(`Sending order ${result.orderNumber} to Amazon crashed:`, error);
+        }
+      }
+    }
 
     let email: ConfirmationResult | undefined;
     if (result.status !== "ignored") {
@@ -52,7 +69,7 @@ export async function handleStripeWebhook(args: {
     }
 
     await db.stripeEvent.createMany({ data: [{ id: event.id, type: event.type }], skipDuplicates: true });
-    return { status: 200, body: { received: true, result, ...(email ? { email } : {}) } };
+    return { status: 200, body: { received: true, result, ...(email ? { email } : {}), ...(amazonResult ? { amazon: amazonResult } : {}) } };
   } catch (error) {
     console.error(`Webhook ${event.id} failed:`, error);
     return { status: 500, body: { error: "Could not record the order" } };

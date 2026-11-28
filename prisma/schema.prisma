@@ -34,6 +34,9 @@ model Product {
   description String[]  @default([]) // paragraphs
   specs       Json      @default("[]") // [{ "label": "...", "value": "..." }]
   inStock     Boolean   @default(true)
+  stockQuantity  Int?      // units Amazon can ship now (FBA fulfillable), from the last stock check
+  stockCheckedAt DateTime? // when the stock check last ran for this product
+  selfDispatch   Boolean   @default(false) // posted by the owner, not stored at Amazon (FBA), so never sent to Amazon to post
   published   Boolean   @default(false)
   image       String? // /media/<id>.webp for an uploaded image, or an https address
   importedAt       DateTime? // when scripts/import-catalogue.ts last wrote this product from Amazon data
@@ -115,6 +118,14 @@ model Order {
   confirmationSentAt  DateTime?
   confirmationEmailId String?
   confirmationError   String?
+  // Amazon Multi-Channel Fulfilment: the order sent to Amazon to pick, pack and post from FBA stock.
+  amazonFulfilmentId  String?   // our id for it at Amazon, e.g. TCS-1001
+  amazonSentAt        DateTime?
+  amazonError         String?   // the last problem sending it, shown on the Orders page
+  amazonStatus        String?   // Amazon's status, e.g. PROCESSING, COMPLETE
+  trackingNumber      String?
+  carrier             String?
+  shippedAt           DateTime?
   items               OrderItem[]
   invoice             Invoice?
 

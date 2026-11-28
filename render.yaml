@@ -37,6 +37,11 @@ services:
         value: eu
       - key: SP_API_SANDBOX
         value: "true" # stays on the Amazon test system until the owner says otherwise
+      # "true" sends each paid website order to Amazon to post (Multi-Channel Fulfilment)
+      - key: MCF_ENABLED
+        value: "false"
+      - key: SP_API_SELLER_ID # the Amazon seller (merchant) id; not secret
+        value: A8D4IIOQG6Q5B
       # Dashboard sign-in. Set only ADMIN_PASSWORD first, then follow /login/setup for the other two.
       - key: ADMIN_PASSWORD
         sync: false
