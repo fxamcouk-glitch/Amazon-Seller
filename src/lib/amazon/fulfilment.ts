@@ -76,6 +76,7 @@ export async function sendOrderToAmazon(db: PrismaClient, orderId: string, clien
   if (!order) return { status: "failed", error: "Order not found" };
   if (order.amazonSentAt) return { status: "already-sent" };
   if (order.status !== "PAID") return { status: "failed", error: `Order is ${order.status.toLowerCase()}, not paid` };
+  if (order.isTest) return { status: "failed", error: "Test order: not sent to Amazon" };
   if (order.amazonError === SELF_DISPATCH_NOTE) return { status: "self-dispatch" };
 
   // Items the owner posts (not stored at Amazon) cannot be sent; the order is left for the owner.
@@ -124,7 +125,7 @@ export function shipmentUpdate(response: unknown): { amazonStatus?: string; trac
 // Checks every sent order that has not shipped yet, and marks it shipped with its tracking.
 export async function refreshShipments(db: PrismaClient, client: Client): Promise<number> {
   const open = await db.order.findMany({
-    where: { status: "PAID", amazonFulfilmentId: { not: null } },
+    where: { status: "PAID", isTest: false, amazonFulfilmentId: { not: null } },
     select: { id: true, amazonFulfilmentId: true },
   });
   let shipped = 0;
@@ -148,7 +149,7 @@ export async function refreshShipments(db: PrismaClient, client: Client): Promis
 // Sends any paid orders that have not reached Amazon yet (for example after an Amazon outage).
 export async function sendUnsentOrders(db: PrismaClient, client: Client): Promise<number> {
   const unsent = await db.order.findMany({
-    where: { status: "PAID", amazonSentAt: null, OR: [{ amazonError: null }, { amazonError: { not: SELF_DISPATCH_NOTE } }] },
+    where: { status: "PAID", isTest: false, amazonSentAt: null, OR: [{ amazonError: null }, { amazonError: { not: SELF_DISPATCH_NOTE } }] },
     select: { id: true },
   });
   let sent = 0;

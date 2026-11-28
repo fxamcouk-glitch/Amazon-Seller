@@ -59,12 +59,13 @@ export async function sendOrderConfirmation(db: PrismaClient, orderId: string, o
   );
 
   const sender = opts.sender ?? createEmailSender(config.config);
+  const subjectLine = order.isTest ? `[TEST] ${subject}` : subject;
   const result = await sender.send({
     from: config.config.from,
     to: order.customerEmail,
     ...(config.config.copyTo ? { bcc: config.config.copyTo } : {}),
     ...(config.config.replyTo ? { replyTo: config.config.replyTo } : {}),
-    subject,
+    subject: subjectLine,
     html,
     text,
     ...(invoice ? { attachments: [{ filename: `invoice-${order.number}.pdf`, content: Buffer.from(invoice.pdf), contentType: "application/pdf" }] } : {}),

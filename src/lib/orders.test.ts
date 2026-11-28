@@ -75,6 +75,16 @@ describe.skipIf(!db)("orders and invoices (Postgres)", () => {
   });
   afterAll(async () => db?.$disconnect());
 
+  it("marks a Stripe test-mode order as a test and gives it no invoice number", async () => {
+    const result = await record(session("cs_test_mode", { livemode: false }), env);
+    expect(result).toMatchObject({ status: "recorded" });
+    const order = await db!.order.findUniqueOrThrow({ where: { stripeSessionId: "cs_test_mode" }, include: { invoice: true } });
+    expect([order.isTest, order.invoice]).toEqual([true, null]);
+    await expect(ensureInvoice(db!, "cs_test_mode", env)).rejects.toThrow("Test orders do not get an invoice");
+    await record(session("cs_live", { livemode: true }), env);
+    expect((await db!.invoice.findMany()).map((i) => i.number)).toEqual([1]); // the real sequence starts at 1
+  });
+
   it("records a paid order with items, address and a numbered invoice PDF", async () => {
     const result = await record(session("cs_test_a"), env);
     expect(result).toMatchObject({ status: "recorded" });

@@ -52,13 +52,18 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
               <tbody>
                 {orders.map((o) => (
                   <tr key={o.id} className="border-b border-line last:border-0">
-                    <th scope="row" className="py-2 pr-4 font-medium">{o.number}</th>
+                    <th scope="row" className="py-2 pr-4 font-medium">
+                      {o.number}
+                      {o.isTest && <span className="ml-2 rounded bg-warn-bg px-1.5 py-0.5 text-xs font-semibold text-warn">TEST</span>}
+                    </th>
                     <td className="py-2 pr-4">{o.paidAt.toLocaleDateString("en-GB", { timeZone: "Europe/London" })}</td>
                     <td className="py-2 pr-4">{o.customerName}</td>
                     <td className="py-2 pr-4">{o.items.map((i) => `${i.quantity} x ${i.sku}`).join(", ")}</td>
                     <td className="py-2 pr-4 text-right tabular-nums">{formatPounds(o.totalPence)}</td>
                     <td className="py-2 pr-4">
-                      {o.invoice ? (
+                      {o.isTest ? (
+                        <span className="text-muted">None (test)</span>
+                      ) : o.invoice ? (
                         <a
                           href={`/api/admin/orders/${o.number}/invoice`}
                           target="_blank"
@@ -93,6 +98,8 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
                           Posted {o.shippedAt.toLocaleDateString("en-GB", { timeZone: "Europe/London" })}
                           {o.trackingNumber && <span className="block text-muted">{o.carrier ? `${o.carrier} ` : ""}{o.trackingNumber}</span>}
                         </span>
+                      ) : o.isTest ? (
+                        <span className="text-muted">Not sent (test)</span>
                       ) : o.amazonSentAt ? (
                         <span>With Amazon ({(o.amazonStatus ?? "received").toLowerCase()})</span>
                       ) : o.status === "PAID" && o.amazonError === SELF_DISPATCH_NOTE ? (

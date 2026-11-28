@@ -10,7 +10,7 @@ const TRUST = [
   { title: "Free UK delivery", note: "On every order", Icon: Truck },
   { title: "30-day returns", note: "On unused items", Icon: RotateCcw },
   { title: "Secure payment", note: "Checkout by Stripe", Icon: Lock },
-  { title: "UK company", note: "Venture 58 Ltd", Icon: MapPin },
+  { title: "UK based", note: "Dispatched from UK stock", Icon: MapPin },
 ];
 
 // The four reasons to buy here. `compact` is the smaller version under the buy box.

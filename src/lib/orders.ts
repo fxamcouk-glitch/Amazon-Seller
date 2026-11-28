@@ -67,6 +67,7 @@ export async function recordPaidOrder(
       const created = await db.order.create({
         data: {
           stripeSessionId: session.id,
+          isTest: session.livemode === false,
           customerName: shipping?.name ?? session.customer_details?.name ?? "",
           customerEmail: session.customer_details?.email ?? "",
           customerPhone: session.customer_details?.phone ?? null,
@@ -96,6 +97,9 @@ export async function recordPaidOrder(
     }
   }
 
+  // Test-mode orders never take an invoice number, so the real sequence has no gaps.
+  if (session.livemode === false) return { status, orderNumber: orderNumber!, orderId: orderId! };
+
   // The order is saved before the invoice is attempted, so a failure here never loses a sale.
   try {
     await ensureInvoice(db, session.id, env);
@@ -119,6 +123,7 @@ export async function ensureInvoice(
   return db.$transaction(async (tx) => {
     const order = await tx.order.findUniqueOrThrow({ where: { stripeSessionId }, include: { items: true, invoice: true } });
     if (order.invoice) return { number: order.invoice.number, created: false };
+    if (order.isTest) throw new Error("Test orders do not get an invoice");
     await tx.invoiceCounter.createMany({ data: [{ id: 1, last: 0 }], skipDuplicates: true });
     const { last } = await tx.invoiceCounter.update({ where: { id: 1 }, data: { last: { increment: 1 } } });
     const pdf = await buildInvoicePdf(toInvoiceOrder(order), last, business.details as BusinessDetails);
